@@ -9,4 +9,12 @@ open class Enviable(dirección: Dirección) {
     fun mostrar_en_pantalla() {
 
     }
+
+    fun get_fecha(): Date {
+        return fecha
+    }
+
+    fun get_direccion(): Dirección {
+        return dirección
+    }
 }

@@ -1,6 +1,6 @@
 package com.example.netless
 
-class Fichero(nombre: String, tamaño: Int, dirección: Dirección) : Enviable(dirección) {
+class Fichero(nombre: String, tamaño: Long, dirección: Dirección) : Enviable(dirección) {
     val nombre = nombre
     val tamaño = tamaño
 
