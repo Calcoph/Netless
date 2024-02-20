@@ -3,7 +3,6 @@ package com.example.netless
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View.OnClickListener
 import android.widget.Button
 
 class MainActivity : AppCompatActivity() {
@@ -13,7 +12,7 @@ class MainActivity : AppCompatActivity() {
         val button = findViewById<Button>(R.id.button2);
 
         button.setOnClickListener {
-            val intent = Intent(this, Chat::class.java);
+            val intent = Intent(this, GUIChat::class.java);
             startActivity(intent);
         }
     }
