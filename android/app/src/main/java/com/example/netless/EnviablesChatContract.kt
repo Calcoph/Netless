@@ -9,11 +9,11 @@ object EnviablesChatContract {
         const val COLUMN_NAME_ENV_ID = "env_id"
     }
 
-    private const val SQL_CREATE_ENTRIES =
+    const val SQL_CREATE_ENTRIES =
         "CREATE TABLE ${EnviablesChatEntry.TABLE_NAME} (" +
             "${EnviablesChatEntry.COLUMN_NAME_CHAT_ID} INTEGER PRIMARY KEY," + // TODO: References
             "${EnviablesChatEntry.COLUMN_NAME_ENV_ID} INTEGER PRIMARY KEY," + // TODO: References
         ")"
     
-    private const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${EnviablesChatEntry.TABLE_NAME}"
+    const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${EnviablesChatEntry.TABLE_NAME}"
 }

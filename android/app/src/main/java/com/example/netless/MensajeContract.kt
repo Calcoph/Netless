@@ -8,11 +8,11 @@ object MensajeContract {
         const val COLUMN_NAME_MENS = "mens"
     }
 
-    private const val SQL_CREATE_ENTRIES =
+    const val SQL_CREATE_ENTRIES =
         "CREATE TABLE ${MensajeEntry.TABLE_NAME} (" +
             "${BaseColumns._ID} INTEGER PRIMARY KEY," +
             "${MensajeEntry.COLUMN_NAME_MENS} TEXT," +
         ")"
     
-    private const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${MensajeEntry.TABLE_NAME}"
+    const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${MensajeEntry.TABLE_NAME}"
 }

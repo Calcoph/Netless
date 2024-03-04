@@ -11,7 +11,7 @@ object EnviableContract {
         const val COLUMN_NAME_MENS_ID = "mens_id"
     }
 
-    private const val SQL_CREATE_ENTRIES =
+    const val SQL_CREATE_ENTRIES =
         "CREATE TABLE ${EnviableEntry.TABLE_NAME} (" +
             "${BaseColumns._ID} INTEGER PRIMARY KEY," +
             "${EnviableEntry.COLUMN_NAME_FECHA} DATE," +
@@ -20,5 +20,5 @@ object EnviableContract {
             "${EnviableEntry.COLUMN_NAME_MENS_ID} INTEGER," + // TODO: References
         ")"
     
-    private const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${EnviableEntry.TABLE_NAME}"
+    const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${EnviableEntry.TABLE_NAME}"
 }

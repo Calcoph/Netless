@@ -9,12 +9,12 @@ object OpcionesContract {
         const val COLUMN_NAME_ID = "id"
     }
 
-    private const val SQL_CREATE_ENTRIES =
+    const val SQL_CREATE_ENTRIES =
         "CREATE TABLE ${OpcionesEntry.TABLE_NAME} (" +
             "${BaseColumns._ID} INTEGER PRIMARY KEY," +
             "${OpcionesEntry.COLUMN_NAME_ALIAS} TEXT," +
             "${OpcionesEntry.COLUMN_NAME_ID} TEXT," +
         ")"
     
-    private const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${OpcionesEntry.TABLE_NAME}"
+    const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${OpcionesEntry.TABLE_NAME}"
 }

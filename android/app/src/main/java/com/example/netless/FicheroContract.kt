@@ -8,11 +8,11 @@ object FicheroContract {
         const val COLUMN_NAME_NOMBRE = "nombre"
     }
 
-    private const val SQL_CREATE_ENTRIES =
+    const val SQL_CREATE_ENTRIES =
         "CREATE TABLE ${FicheroEntry.TABLE_NAME} (" +
             "${BaseColumns._ID} INTEGER PRIMARY KEY," +
             "${FicheroEntry.COLUMN_NAME_NOMBRE} TEXT," +
         ")"
     
-    private const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${FicheroEntry.TABLE_NAME}"
+    const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${FicheroEntry.TABLE_NAME}"
 }

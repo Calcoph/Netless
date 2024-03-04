@@ -8,11 +8,11 @@ object WhitelistContract {
         const val COLUMN_NAME_USR_ID = "usr_id"
     }
 
-    private const val SQL_CREATE_ENTRIES =
+    const val SQL_CREATE_ENTRIES =
         "CREATE TABLE ${WhitelistEntry.TABLE_NAME} (" +
             "${BaseColumns._ID} INTEGER PRIMARY KEY," +
             "${WhitelistEntry.COLUMN_NAME_USR_ID} TEXT," + // TODO: References
         ")"
     
-    private const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${WhitelistEntry.TABLE_NAME}"
+    const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${WhitelistEntry.TABLE_NAME}"
 }

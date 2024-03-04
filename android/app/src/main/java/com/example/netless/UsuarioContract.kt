@@ -10,7 +10,7 @@ object UsuarioContract {
         const val COLUMN_NAME_CHAT_ID = "chat_id"
     }
 
-    private const val SQL_CREATE_ENTRIES =
+    const val SQL_CREATE_ENTRIES =
         "CREATE TABLE ${UsuarioEntry.TABLE_NAME} (" +
             "${BaseColumns._ID} INTEGER PRIMARY KEY," +
             "${UsuarioEntry.COLUMN_NAME_ALIAS} TEXT," +
@@ -18,5 +18,5 @@ object UsuarioContract {
             "${UsuarioEntry.COLUMN_NAME_CHAT_ID} INTEGER" + // TODO: References
         ")"
     
-    private const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${UsuarioEntry.TABLE_NAME}"
+    const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${UsuarioEntry.TABLE_NAME}"
 }
