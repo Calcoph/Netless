@@ -1,4 +1,4 @@
-package com.example.netless
+package com.netless.database
 
 import android.provider.BaseColumns
 

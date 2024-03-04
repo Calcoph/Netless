@@ -1,4 +1,4 @@
-package com.example.netless
+package com.netless.main
 
 class GUIPrincipal {
     fun abrir_chat(id: String) {

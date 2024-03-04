@@ -1,4 +1,4 @@
-package com.example.netless
+package com.netless.main
 
 class Fichero(nombre: String, tamaño: Long, dirección: Dirección) : Enviable(dirección) {
     val nombre = nombre

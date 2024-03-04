@@ -1,4 +1,4 @@
-package com.example.netless
+package com.netless.main
 
 class Whitelist {
     companion object {
