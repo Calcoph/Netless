@@ -16,8 +16,10 @@ object EnviableContract {
             "${BaseColumns._ID} INTEGER PRIMARY KEY," +
             "${EnviableEntry.COLUMN_NAME_FECHA} DATE," +
             "${EnviableEntry.COLUMN_NAME_DIRECCION} INTEGER," +
-            "${EnviableEntry.COLUMN_NAME_FICH_ID} INTEGER," + // TODO: References
-            "${EnviableEntry.COLUMN_NAME_MENS_ID} INTEGER," + // TODO: References
+            "${EnviableEntry.COLUMN_NAME_FICH_ID} INTEGER," +
+            "${EnviableEntry.COLUMN_NAME_MENS_ID} INTEGER," +
+            "CONSTRAINT fk_fich FOREIGN KEY (${EnviableEntry.COLUMN_NAME_FICH_ID}) REFERENCES ${FicheroContract.FicheroEntry.TABLE_NAME} (${BaseColumns._ID})" +
+            "CONSTRAINT fk_mens FOREIGN KEY (${EnviableEntry.COLUMN_NAME_MENS_ID}) REFERENCES ${MensajeContract.MensajeEntry.TABLE_NAME} (${BaseColumns._ID})" +
         ")"
     
     const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${EnviableEntry.TABLE_NAME}"
