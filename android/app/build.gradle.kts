@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.netless"
+    namespace = "com.netless.main"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.netless"
+        applicationId = "com.netless.main"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
