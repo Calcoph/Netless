@@ -1,5 +1,12 @@
 package com.netless.main
 
+import android.content.ContentValues
+import android.content.Context
+import android.provider.BaseColumns
+import com.netless.database.MensajeContract
+import com.netless.database.UsuarioContract
+import com.netless.database.WhitelistContract
+
 class Whitelist {
     companion object {
         // Singleton pattern
@@ -14,16 +21,50 @@ class Whitelist {
 
     val listaIds = ArrayList<String>()
 
-    fun añadir_usuario(id: String) {
+    fun añadir_usuario(id: String, context: Context) {
         listaIds.add(id)
-        "SELECT from Usuario WHERE usr_id = ${id}"
-        "INSERT into Whitelist(usr_id, id, alias, chat_id) VALUES (${usr_id}, ${id}, ${alias}, ${chat_id})"
+
+        val dbHelper = DbHelper(context)
+        val db = dbHelper.writableDatabase
+
+        val projection = arrayOf(BaseColumns._ID)
+
+        val selection = "${UsuarioContract.UsuarioEntry.COLUMN_NAME_ID} = ?"
+        val selectionArgs = arrayOf(id)
+        val cursor = db.query(
+            UsuarioContract.UsuarioEntry.TABLE_NAME,
+            projection,
+            selection,
+            selectionArgs,
+            null,
+            null,
+            null
+        )
+
+        val usrId: Int;
+        with(cursor) {
+            moveToNext()
+            usrId = getInt(getColumnIndexOrThrow(com.netless.database.UsuarioContract.UsuarioEntry.COLUMN_NAME_CHAT_ID))
+        }
+        cursor.close()
+
+        val values = ContentValues().apply {
+            put(WhitelistContract.WhitelistEntry.COLUMN_NAME_USR_ID, usrId)
+        }
+
+        val whitelistEntryId = db?.insert(WhitelistContract.WhitelistEntry.TABLE_NAME, null, values)
     }
 
-    fun quitar_usuario(id: String) {
+    fun quitar_usuario(id: String, context: Context) {
         listaIds.remove(id)
 
-        "DELETE FROM Whitelist WHERE usr_id = ${id}"
+        val dbHelper = DbHelper(context)
+        val db = dbHelper.writableDatabase
+
+        val selection = "${WhitelistContract.WhitelistEntry.COLUMN_NAME_USR_ID} = ?"
+        val selectionArgs = arrayOf(id)
+
+        val deletedRows = db.delete(WhitelistContract.WhitelistEntry.TABLE_NAME, selection, selectionArgs)
     }
 
     fun usuario_aceptado(id: String): Boolean {

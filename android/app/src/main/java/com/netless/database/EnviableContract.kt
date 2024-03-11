@@ -14,7 +14,7 @@ object EnviableContract {
     const val SQL_CREATE_ENTRIES =
         "CREATE TABLE ${EnviableEntry.TABLE_NAME} (" +
             "${BaseColumns._ID} INTEGER PRIMARY KEY," +
-            "${EnviableEntry.COLUMN_NAME_FECHA} DATE," +
+            "${EnviableEntry.COLUMN_NAME_FECHA} TEXT," +
             "${EnviableEntry.COLUMN_NAME_DIRECCION} INTEGER," +
             "${EnviableEntry.COLUMN_NAME_FICH_ID} INTEGER," +
             "${EnviableEntry.COLUMN_NAME_MENS_ID} INTEGER," +

@@ -3,6 +3,16 @@ package com.netless.main
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.netless.database.ChatContract
+import com.netless.database.EnviableContract
+import com.netless.database.EnviablesChatContract
+import com.netless.database.FicheroContract
+import com.netless.database.MensajeContract
+import com.netless.database.OpcionesContract
+import com.netless.database.UsuarioContract
+import com.netless.database.WhitelistContract
+import java.text.SimpleDateFormat
+import java.util.Date
 
 class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     override fun onCreate(db: SQLiteDatabase) {
@@ -32,5 +42,9 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
     companion object {
         const val DATABASE_VERSION = 1
         const val DATABASE_NAME = "NetLess.db"
+
+        fun dateToString(date: Date): String {
+            return SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(date).toString()
+        }
     }
 }

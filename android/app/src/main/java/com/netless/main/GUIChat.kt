@@ -1,7 +1,10 @@
 package com.netless.main
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.TextView
+import com.google.android.material.textfield.TextInputEditText
 import java.io.File
 
 class GUIChat(id: String) : AppCompatActivity() {
@@ -27,18 +30,19 @@ class GUIChat(id: String) : AppCompatActivity() {
         setContentView(R.layout.chat)
     }
 
-    fun enviar_mensaje() {
-        val msg = textbox.get_text()
-        usuario.enviar_mensaje(msg)
+    fun enviar_mensaje(context: Context) {
+        val textbox = findViewById<TextInputEditText>(R.id.textInputEditText)
+        val msg = textbox.text.toString()
+        usuario.enviar_mensaje(msg, context)
     }
 
-    fun enviar_fichero() {
+    fun enviar_fichero(context: Context) {
         val fich = seleccionar_fichero()
         val nombre = fich.name
         val tamaño = fich.totalSpace
 
         usuario.obtener_confirmacion(nombre, tamaño)
-        usuario.enviar_fichero(fich)
+        usuario.enviar_fichero(fich, context)
     }
 
     fun activar_envio() {
@@ -49,10 +53,10 @@ class GUIChat(id: String) : AppCompatActivity() {
 
     }
 
-    fun eliminar_de_whitelist() {
+    fun eliminar_de_whitelist(context: Context) {
         val id = usuario.obtener_id()
         val wl = Whitelist.get_whitelist()
-        wl.quitar_usuario(id)
+        wl.quitar_usuario(id, context)
     }
 
     fun seleccionar_fichero(): File {

@@ -1,5 +1,6 @@
 package com.netless.main
 
+import android.content.Context
 import java.io.File
 
 class Usuario(nombre: String, ip: String, id: String) {
@@ -12,16 +13,16 @@ class Usuario(nombre: String, ip: String, id: String) {
 
     }
 
-    fun enviar_fichero(fichero: File) {
+    fun enviar_fichero(fichero: File, context: Context) {
         val nombre = fichero.name
         val tamaño = fichero.totalSpace
         val fichero = Fichero(nombre, tamaño, Dirección.Saliente)
-        chat.añadir_enviable(fichero, id)
+        chat.añadir_fichero(fichero, id, context)
     }
 
-    fun enviar_mensaje(msg: String) {
+    fun enviar_mensaje(msg: String, context: Context) {
         val mens = Mensaje(msg, Dirección.Saliente)
-        chat.añadir_mensaje(mens, id)
+        chat.añadir_mensaje(mens, id, context)
     }
 
     fun obtener_nombre(): String {
