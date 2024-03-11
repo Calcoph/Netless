@@ -43,6 +43,8 @@ class DbHelper:
                 self.cur.execute(contract.SQL_CREATE_ENTRIES)
             self.con.commit()
             self.DB = self
+        else:
+            raise SystemError
     
     def get() -> DbHelper:
         if DbHelper.DB is None:
