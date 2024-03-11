@@ -14,7 +14,7 @@ object UsuarioContract {
         "CREATE TABLE ${UsuarioEntry.TABLE_NAME} (" +
             "${BaseColumns._ID} INTEGER PRIMARY KEY," +
             "${UsuarioEntry.COLUMN_NAME_ALIAS} TEXT," +
-            "${UsuarioEntry.COLUMN_NAME_SUBTITLE} TEXT" +
+            "${UsuarioEntry.COLUMN_NAME_ID} TEXT" +
             "${UsuarioEntry.COLUMN_NAME_CHAT_ID} INTEGER" +
             "CONSTRAINT fk_chat FOREIGN KEY (${UsuarioEntry.COLUMN_NAME_CHAT_ID}) REFERENCES ${ChatContract.ChatEntry.TABLE_NAME} (${BaseColumns._ID})" +
         ")"
