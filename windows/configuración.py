@@ -8,6 +8,7 @@ class Whitelist:
     def __init__(self) -> None:
         if Whitelist.LISTA is None:
             self.lista_ids: list[str] = []
+            self.LISTA = self
         else:
             raise SystemError
     
@@ -56,6 +57,7 @@ class OpcionesUsuario:
         if OpcionesUsuario.OPCIONES is None:
             self.alias = ""
             self.id = ""
+            self.OPCIONES = self
         else:
             raise SystemError
     

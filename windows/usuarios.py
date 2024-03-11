@@ -83,6 +83,7 @@ class ListaUsuarios:
     def __init__(self) -> None:
         if ListaUsuarios.LISTA is None:
             self.usuarios: list[Usuario] = []
+            self.LISTA = self
         else:
             raise SystemError
     
