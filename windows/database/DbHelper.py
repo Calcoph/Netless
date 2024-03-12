@@ -2,6 +2,9 @@ import sqlite3
 from __future__ import annotations
 from contracts import ChatContract, EnviableContract, EnviablesChatContract, FicheroContract, MensajeContract, OpcionesContract, UsuarioContract, WhiteListContract, Contract
 
+from ..configuración import OpcionesUsuario
+
+
 DBType = str | int
 DBParameters = tuple[DBType] | dict[str, DBType]
 
@@ -37,21 +40,36 @@ class DbHelper:
         """NUNCA LLAMAR A LA CONSTRUCTORA DIRECTAMENTE, usar .get()"""
 
         if self.DB is None:
-            self.con = sqlite3.connect(self.DB_NAME)
-            self.cur = self.con.cursor()
-            for contract in self.CONTRACTS:
-                self.cur.execute(contract.SQL_CREATE_ENTRIES)
-            self.con.commit()
+            self._init_db()
             self.DB = self
         else:
             raise SystemError
+    
+    def _init_db(self) -> None:
+        """NUNCA LLAMAR A ESTA FUNCIÓN, usar .get()"""
+        self.con = sqlite3.connect(self.DB_NAME)
+        self.cur = self.con.cursor()
+        tablas_creadas = self.cur.execute("SELECT name FROM sqlite_master").fetchall()
+        for contract in self.CONTRACTS:
+            if contract.TABLE_NAME not in tablas_creadas:
+                self.cur.execute(contract.SQL_CREATE_ENTRIES)
+        
+        if len(self.cur.execute(f"SELECT * FROM {OpcionesContract.TABLE_NAME}").fetchall()) == 0:
+            # No hay opciones
+            # Hay que inicializar la tabla
+            id = OpcionesUsuario.generar_id_aleatorio()
+            alias_por_defecto = "(Sin alias)"
+            self.cur.execute(f"INSERT INTO {OpcionesContract.TABLE_NAME}({OpcionesContract.COLUMN_NAME_ID}, {OpcionesContract.COLUMN_NAME_ALIAS}) VALUES ({id}, {alias_por_defecto})");
+
+        self.con.commit()
+
     
     def get() -> DbHelper:
         if DbHelper.DB is None:
             DbHelper()
         
         return DbHelper.DB
-    
+
     def insert(self, table_name: str, value: tuple[DBType], column_names: list[str]=[]) -> int:
         if len(column_names) == 0:
             column_names_str = ""

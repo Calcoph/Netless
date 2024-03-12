@@ -10,6 +10,11 @@ class OpcionesUsuario {
             opciones ?: synchronized(this) {
                 opciones ?: OpcionesUsuario().also { opciones = it }
             }
+
+        fun generar_id_aleatorio(): String {
+            // TODO: No es aleatorio
+            return "93507297509234"
+        }
     }
 
     var alias = String()

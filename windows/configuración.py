@@ -71,3 +71,7 @@ class OpcionesUsuario:
     
     def cambiar_id(self, nuevo_id: str):
         self.id = nuevo_id
+    
+    def generar_id_aleatorio() -> str:
+        # TODO: No es aleatorio
+        return "93507297509234"

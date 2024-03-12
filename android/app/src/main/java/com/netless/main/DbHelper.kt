@@ -25,6 +25,16 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
         db.execSQL(UsuarioContract.SQL_CREATE_ENTRIES)
         db.execSQL(WhitelistContract.SQL_CREATE_ENTRIES)
         db.execSQL(OpcionesContract.SQL_CREATE_ENTRIES)
+
+        val cur = db.rawQuery("SELECT * FROM ${OpcionesContract.OpcionesEntry.TABLE_NAME}", arrayOf())
+        if (!cur.moveToNext()) {
+            // No hay opciones
+            // Hay que inicializar la tabla
+            val id = OpcionesUsuario.generar_id_aleatorio()
+            val aliasPorDefecto = "(Sin alias)"
+            db.execSQL("INSERT INTO ${OpcionesContract.OpcionesEntry.TABLE_NAME}(${OpcionesContract.OpcionesEntry.COLUMN_NAME_ID}, ${OpcionesContract.OpcionesEntry.COLUMN_NAME_ALIAS}) VALUES (${id}, ${aliasPorDefecto})");
+        }
+        cur.close()
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
