@@ -9,16 +9,16 @@ class GUIPrincipal : AppCompatActivity() {
         setContentView(R.layout.principal)
     }
 
-    fun abrir_chat(id: String) {
+    fun abrirChat(id: String) {
         GUIChat(id)
     }
 
-    fun abrir_opciones() {
+    fun abrirOpciones() {
 
     }
 
-    fun aceptar_usuario(id: String) {
-        var wl = Whitelist.get_whitelist()
-        wl.añadir_usuario(id, applicationContext)
+    fun aceptarUsuario(id: String) {
+        val wl = Whitelist.getWhitelist()
+        wl.anadirUsuario(id, applicationContext)
     }
 }

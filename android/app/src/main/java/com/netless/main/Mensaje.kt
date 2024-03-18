@@ -1,5 +1,7 @@
 package com.netless.main
 
-class Mensaje(msg: String, dirección: Dirección) : Enviable(dirección) {
-    val msg = msg
+class Mensaje(private val msg: String, direccion: Direccion) : Enviable(direccion) {
+    fun getMsg(): String {
+        return msg
+    }
 }

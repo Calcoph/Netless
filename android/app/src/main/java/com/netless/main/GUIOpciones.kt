@@ -9,11 +9,11 @@ class GUIOpciones : AppCompatActivity() {
         setContentView(R.layout.opciones)
     }
 
-    fun cambiar_alias() {
+    fun cambiarAlias() {
 
     }
 
-    fun cambiar_id(nuevo_id: String) {
+    fun cambiarId(nuevoId: String) {
 
     }
 }

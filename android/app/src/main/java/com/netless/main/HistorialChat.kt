@@ -7,15 +7,14 @@ import com.netless.database.EnviablesChatContract
 import com.netless.database.FicheroContract
 import com.netless.database.MensajeContract
 import com.netless.database.UsuarioContract
-import java.text.SimpleDateFormat
 
 class HistorialChat {
-    val listaEnviables = ArrayList<Enviable>()
+    private val listaEnviables = ArrayList<Enviable>()
 
-    fun añadir_fichero(fichero: Fichero, id_usuario: String, context: Context) {
-        val nombre = fichero.get_nombre()
-        val fecha = fichero.get_fecha()
-        val direccion = fichero.get_direccion()
+    fun anadirFichero(fichero: Fichero, idUsuario: String, context: Context) {
+        val nombre = fichero.getNombre()
+        val fecha = fichero.getFecha()
+        val direccion = fichero.getDireccion()
 
         val dbHelper = DbHelper(context)
         val db = dbHelper.writableDatabase
@@ -34,13 +33,13 @@ class HistorialChat {
 
         val envId = db?.insert(EnviableContract.EnviableEntry.TABLE_NAME, null, values)?.toInt()!!
 
-        añadir_enviable(fichero, envId, id_usuario, context)
+        anadirEnviable(fichero, envId, idUsuario, context)
     }
 
-    fun añadir_mensaje(mens: Mensaje, id_usuario: String, context: Context) {
-        val msg = mens.msg
-        val fecha = mens.get_fecha()
-        val direccion = mens.get_direccion()
+    fun anadirMensaje(mens: Mensaje, idUsuario: String, context: Context) {
+        val msg = mens.getMsg()
+        val fecha = mens.getFecha()
+        val direccion = mens.getDireccion()
 
         val dbHelper = DbHelper(context)
         val db = dbHelper.writableDatabase
@@ -59,12 +58,12 @@ class HistorialChat {
 
         val envId = db?.insert(EnviableContract.EnviableEntry.TABLE_NAME, null, values)?.toInt()!!
 
-        añadir_enviable(mens, envId, id_usuario, context)
+        anadirEnviable(mens, envId, idUsuario, context)
     }
 
-    private fun añadir_enviable(enviable: Enviable, envId: Int, id_usuario: String, context: Context) {
+    private fun anadirEnviable(enviable: Enviable, envId: Int, idUsuario: String, context: Context) {
         listaEnviables.add(enviable)
-        mostrar_en_pantalla()
+        mostrarEnPantalla()
 
         val dbHelper = DbHelper(context)
         val db = dbHelper.writableDatabase
@@ -72,7 +71,7 @@ class HistorialChat {
         val projection = arrayOf(UsuarioContract.UsuarioEntry.COLUMN_NAME_CHAT_ID)
 
         val selection = "${UsuarioContract.UsuarioEntry.COLUMN_NAME_ID} = ?"
-        val selectionArgs = arrayOf(id_usuario)
+        val selectionArgs = arrayOf(idUsuario)
         val cursor = db.query(
             UsuarioContract.UsuarioEntry.TABLE_NAME,
             projection,
@@ -83,10 +82,10 @@ class HistorialChat {
             null
         )
 
-        val chatId: Int;
+        val chatId: Int
         with(cursor) {
             moveToNext()
-            chatId = getInt(getColumnIndexOrThrow(com.netless.database.UsuarioContract.UsuarioEntry.COLUMN_NAME_CHAT_ID))
+            chatId = getInt(getColumnIndexOrThrow(UsuarioContract.UsuarioEntry.COLUMN_NAME_CHAT_ID))
         }
         cursor.close()
 
@@ -98,9 +97,9 @@ class HistorialChat {
         val enviableChatId = db?.insert(EnviablesChatContract.EnviablesChatEntry.TABLE_NAME, null, values)
     }
 
-    fun mostrar_en_pantalla() {
+    fun mostrarEnPantalla() {
         for (enviable in listaEnviables) {
-            enviable.mostrar_en_pantalla()
+            enviable.mostrarEnPantalla()
         }
     }
 }

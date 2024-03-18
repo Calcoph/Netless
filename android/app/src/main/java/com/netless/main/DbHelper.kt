@@ -32,7 +32,7 @@ class DbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null
             // Hay que inicializar la tabla
             val id = OpcionesUsuario.generar_id_aleatorio()
             val aliasPorDefecto = "(Sin alias)"
-            db.execSQL("INSERT INTO ${OpcionesContract.OpcionesEntry.TABLE_NAME}(${OpcionesContract.OpcionesEntry.COLUMN_NAME_ID}, ${OpcionesContract.OpcionesEntry.COLUMN_NAME_ALIAS}) VALUES (${id}, ${aliasPorDefecto})");
+            db.execSQL("INSERT INTO ${OpcionesContract.OpcionesEntry.TABLE_NAME}(${OpcionesContract.OpcionesEntry.COLUMN_NAME_ID}, ${OpcionesContract.OpcionesEntry.COLUMN_NAME_ALIAS}) VALUES (${id}, ${aliasPorDefecto})")
         }
         cur.close()
     }

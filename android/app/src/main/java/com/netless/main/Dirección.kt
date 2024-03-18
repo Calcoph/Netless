@@ -1,6 +1,6 @@
 package com.netless.main
 
-enum class Dirección {
+enum class Direccion {
     Entrante {
         override fun toInt() = 1
     },
@@ -9,10 +9,10 @@ enum class Dirección {
     };
 
     abstract fun toInt(): Int
-    fun fromInt(int: Int): Dirección? {
+    fun fromInt(int: Int): Direccion? {
         return when(int) {
-            1 -> Dirección.Entrante
-            2 -> Dirección.Saliente
+            1 -> Entrante
+            2 -> Saliente
             else -> null
         }
     }

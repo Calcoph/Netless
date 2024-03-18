@@ -2,19 +2,18 @@ package com.netless.main
 
 import java.util.Date
 
-open class Enviable(dirección: Dirección) {
-    val fecha = Date()
-    val dirección = dirección
+open class Enviable(private val direccion: Direccion) {
+    private val fecha = Date()
 
-    fun mostrar_en_pantalla() {
+    fun mostrarEnPantalla() {
 
     }
 
-    fun get_fecha(): Date {
+    fun getFecha(): Date {
         return fecha
     }
 
-    fun get_direccion(): Dirección {
-        return dirección
+    fun getDireccion(): Direccion {
+        return direccion
     }
 }

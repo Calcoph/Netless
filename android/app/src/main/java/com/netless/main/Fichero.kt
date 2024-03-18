@@ -1,10 +1,7 @@
 package com.netless.main
 
-class Fichero(nombre: String, tamaño: Long, dirección: Dirección) : Enviable(dirección) {
-    val nombre = nombre
-    val tamaño = tamaño
-
-    fun get_nombre(): String {
+class Fichero(private val nombre: String, private val tamano: Long, direccion: Direccion) : Enviable(direccion) {
+    fun getNombre(): String {
         return nombre
     }
 }

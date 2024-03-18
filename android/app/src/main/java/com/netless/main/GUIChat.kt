@@ -1,26 +1,26 @@
 package com.netless.main
 
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.TextView
 import com.google.android.material.textfield.TextInputEditText
 import java.io.File
 
 class GUIChat(id: String) : AppCompatActivity() {
-    val usuario: Usuario
+    private val usuario: Usuario
     init {
-        val usuarios = ListaUsuarios.get_lista()
-        usuario = usuarios.obtener_usuario(id)!!
-        val nombre = usuario.obtener_nombre()
-        val chat = usuario.obtener_chat()
-        chat.mostrar_en_pantalla()
-        if (usuario.acepta_conexiones()) {
-            activar_envio()
+        val usuarios = ListaUsuarios.getLista()
+        usuario = usuarios.obtenerUsuario(id)!!
+        val nombre = usuario.obtenerNombre()
+        val chat = usuario.obtenerChat()
+        chat.mostrarEnPantalla()
+        if (usuario.aceptaConexiones()) {
+            activarEnvio()
         } else {
-            desactivar_envio()
-            if (usuario.solicitar_conexion()) {
-                activar_envio()
+            desactivarEnvio()
+            if (usuario.solicitarConexion()) {
+                activarEnvio()
             }
         }
     }
@@ -30,36 +30,38 @@ class GUIChat(id: String) : AppCompatActivity() {
         setContentView(R.layout.chat)
     }
 
-    fun enviar_mensaje(context: Context) {
+    fun enviarMensaje(context: Context) {
         val textbox = findViewById<TextInputEditText>(R.id.textInputEditText)
         val msg = textbox.text.toString()
-        usuario.enviar_mensaje(msg, context)
+        usuario.enviarMensaje(msg, context)
     }
 
-    fun enviar_fichero(context: Context) {
-        val fich = seleccionar_fichero()
+    fun enviarFichero(context: Context) {
+        //val fich = seleccionar_fichero()
+        val fich = File("") // TODO: get an actual file
         val nombre = fich.name
-        val tamaño = fich.totalSpace
+        val tamano = fich.totalSpace
 
-        usuario.obtener_confirmacion(nombre, tamaño)
-        usuario.enviar_fichero(fich, context)
+        usuario.obtenerConfirmacion(nombre, tamano)
+        usuario.enviarFichero(fich, context)
     }
 
-    fun activar_envio() {
-
-    }
-
-    fun desactivar_envio() {
+    fun activarEnvio() {
 
     }
 
-    fun eliminar_de_whitelist(context: Context) {
-        val id = usuario.obtener_id()
-        val wl = Whitelist.get_whitelist()
-        wl.quitar_usuario(id, context)
+    fun desactivarEnvio() {
+
     }
 
-    fun seleccionar_fichero(): File {
+    fun eliminarDeWhitelist(context: Context) {
+        val id = usuario.obtenerId()
+        val wl = Whitelist.getWhitelist()
+        wl.quitarUsuario(id, context)
+    }
 
+    fun seleccionarFichero() {
+        val intent = Intent().setType("*/*").setAction(Intent.ACTION_GET_CONTENT)
+        startActivity(intent)
     }
 }

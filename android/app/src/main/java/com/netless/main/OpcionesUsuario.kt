@@ -17,8 +17,8 @@ class OpcionesUsuario {
         }
     }
 
-    var alias = String()
-    var id = String()
+    private var alias = String()
+    private var id = String()
 
     fun cambiar_alias(nuevo_alias: String) {
         alias = nuevo_alias

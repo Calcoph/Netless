@@ -8,25 +8,25 @@ class ListaUsuarios private constructor() {
         @Volatile
         private var lista: ListaUsuarios? = null
 
-        fun get_lista() =
+        fun getLista() =
             lista ?: synchronized(this) {
                 lista ?: ListaUsuarios().also { lista = it }
             }
     }
 
-    val usuarios = ArrayList<Usuario>()
+    private val usuarios = ArrayList<Usuario>()
 
-    fun añadir_usuario(usr: Usuario) {
+    fun anadirUsuario(usr: Usuario) {
         usuarios.add(usr)
     }
 
-    fun quitar_usuario(id: String) {
-        usuarios.removeIf { it.id == id }
+    fun quitarUsuario(id: String) {
+        usuarios.removeIf { it.obtenerId() == id }
     }
 
-    fun obtener_usuario(id: String): Usuario? {
+    fun obtenerUsuario(id: String): Usuario? {
         for (usuario in usuarios) {
-            if (usuario.id == id) {
+            if (usuario.obtenerId() == id) {
                 return usuario
             }
         }

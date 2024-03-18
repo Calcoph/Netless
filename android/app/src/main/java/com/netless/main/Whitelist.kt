@@ -3,7 +3,6 @@ package com.netless.main
 import android.content.ContentValues
 import android.content.Context
 import android.provider.BaseColumns
-import com.netless.database.MensajeContract
 import com.netless.database.UsuarioContract
 import com.netless.database.WhitelistContract
 
@@ -13,15 +12,15 @@ class Whitelist {
         @Volatile
         private var lista: Whitelist? = null
 
-        fun get_whitelist() =
+        fun getWhitelist() =
             lista ?: synchronized(this) {
                 lista ?: Whitelist().also { lista = it }
             }
     }
 
-    val listaIds = ArrayList<String>()
+    private val listaIds = ArrayList<String>()
 
-    fun añadir_usuario(id: String, context: Context) {
+    fun anadirUsuario(id: String, context: Context) {
         listaIds.add(id)
 
         val dbHelper = DbHelper(context)
@@ -55,7 +54,7 @@ class Whitelist {
         val whitelistEntryId = db?.insert(WhitelistContract.WhitelistEntry.TABLE_NAME, null, values)
     }
 
-    fun quitar_usuario(id: String, context: Context) {
+    fun quitarUsuario(id: String, context: Context) {
         listaIds.remove(id)
 
         val dbHelper = DbHelper(context)
@@ -67,7 +66,7 @@ class Whitelist {
         val deletedRows = db.delete(WhitelistContract.WhitelistEntry.TABLE_NAME, selection, selectionArgs)
     }
 
-    fun usuario_aceptado(id: String): Boolean {
+    fun usuarioAceptado(id: String): Boolean {
         return listaIds.contains(id)
     }
 }
