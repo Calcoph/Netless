@@ -118,8 +118,12 @@ class MessageSenderApp:
                     file_content = file.read()
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.connect((destination_ip, 12345))  # se lee el archivo y se envía por el socket
-                s.sendall(f"FILE\n{file_path.split('/')[-1]}".encode('utf-8'))
-                s.sendall(file_content)
+                ##s.sendall(f"FILE\n{file_path.split('/')[-1]}".encode('utf-8'))
+                file_name_bytes = file_path.split('/')[-1].encode('utf-8')
+                s.sendall(b"FILE\n" + file_name_bytes)
+
+                ##s.sendall(f"FILE\n{file_path.split('/')[-1]}")  #sin codificar
+                ##s.sendall(file_content)
                 s.close()
                 self.text_area.insert(tk.END, f"[You] Sent file: {file_path}\n")
             except Exception as e:
