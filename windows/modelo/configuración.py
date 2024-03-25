@@ -1,7 +1,6 @@
 from __future__ import annotations
-
-from database.DbHelper import DbHelper
-from database.contracts import UsuarioContract, WhiteListContract
+from .database.DbHelper import DbHelper
+from .database.contracts import UsuarioContract, WhiteListContract
 from .crypt import generar_claves, serializar_claves
 
 class Whitelist:

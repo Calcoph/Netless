@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import scrolledtext, filedialog
 import socket
 import threading
+
+# No sólo importa discover, si no que además inicializa el descubrimiento
 import discover
 
 
