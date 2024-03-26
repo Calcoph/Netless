@@ -32,3 +32,6 @@ def serializar_claves(clave_privada: RSAPrivateKey, clave_publica: RSAPublicKey)
 
     with open('public_key.pem', 'wb') as f:
         f.write(public_pem) """
+
+def encriptar_mensaje(clave_privada: RSAPrivateKey):
+    pass
