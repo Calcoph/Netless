@@ -206,40 +206,6 @@ class MessageSenderApp(tk.Frame):
             except Exception as e:
                 print(f"An error occurred while sending file: {str(e)}")
 
-#opcione de recibir mensaje alternativa, falta solucionar la recepcion de ficheros (mejor formato binario)
-"""""
-    def receive_messages(self):
-        #s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #s.bind(('0.0.0.0', 12345)) 
-        #s.listen(1)
-        
-        while True:
-            try:
-                data = self.socket.recv(1024)
-                if not data:
-                    break
-                if data.startswith(b"file|"):
-                    file_info, file_data = data.split(b'\n', 1)
-                    file_name, file_size = file_info.decode().split('|')[1:]
-                    file_name = file_name.strip()
-                    file_size = int(file_size.strip())
-                    received_data = file_data
-                    while len(received_data) < file_size:
-                        chunk = self.socket.recv(min(1024, file_size - len(received_data)))
-                        if not chunk:
-                            break
-                        received_data += chunk
-                    with open(file_name, 'wb') as file:
-                        file.write(received_data)
-                    messagebox.showinfo("File Received", f"File '{file_name}' received successfully.")
-                else:
-                    message = data.decode()
-                    self.text_area.insert(tk.END, f"{message}\n")
-            except ConnectionResetError:
-                break
-"""""
-    
-
 def iniciar():
     root = tk.Tk()
     app = MessageSenderApp(root)
