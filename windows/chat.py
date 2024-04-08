@@ -90,11 +90,8 @@ class GUIPrincipal(tk.Frame):
         self.label = tk.Label(self, text="Hello world (GUIPrincipal)")
         self.label.grid(row=0, column=0, padx=5, pady=5)
 
-        ###################################################################################################
-        #boton de  de las redes disponibles
         self.button_send_message = tk.Button(self, text="Escanear Lan", command=self.scan_lan)
         self.button_send_message.grid(row=1, column=0, padx=5, pady=5)
-        ###################################################################################################
 
         self.usuarios = tk.Frame(self)
         self.usuarios.grid(row=2, column=0, padx=5, pady=5)
@@ -121,26 +118,13 @@ class MessageSenderApp(tk.Frame):
         self.root = root
         self.root.title("Netless")
 
-        ###################################################################################################
-        #hacer label y entradas de las direcciones que se encuentran
-        #primero averiguar cuántas hay
-        #segundo label
-        #tercero botones
-
-        ####################################################################################################
-
-        #area de texto para direcciones
-        #self.directions_area = scrolledtext.ScrolledText(self, width=60, height=10)
-        #self.directions_area.grid(row=4, columnspan=1, padx=5, pady=5)
-
         self.back_button = tk.Button(self, text="Volver a lista de usuarios", command=self.volver_a_lista_usuarios)
         self.vista_seleccionada = Vistas.USUARIOS
         self.vista_lista_usuarios = GUIPrincipal(self)
         self.vista_lista_usuarios.grid(row=7, column=0, padx=5, pady=5)
 
         self.vista_mensajes = GUIChat(self)
-
-        #hilo de receptor
+        
         self.receiver_thread = threading.Thread(target=self.receive_messages, daemon=True)
         self.receiver_thread.start()
 
