@@ -172,6 +172,31 @@ class MessageSenderApp(tk.Frame):
                         self.text_area.insert(tk.END, f"[{addr[0]}] Received file: {file_name}\n")
                         break
 
+<<<<<<< HEAD
+    #al pulsar el botón enviar archivo se ejecuta esta función
+    def send_file(self):
+        destination_ip = self.entry_to.get()
+        #a diferencia de send_message el archivo se obtiene de una ventana emergente
+        file_path = filedialog.askopenfilename()
+        if file_path:
+            try:
+                with open(file_path, 'rb') as file:
+                    file_content = file.read()
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect((destination_ip, 12345))  # se lee el archivo y se envía por el socket
+                ##s.sendall(f"FILE\n{file_path.split('/')[-1]}".encode('utf-8'))
+                file_name_bytes = file_path.split('/')[-1].encode('utf-8')
+                s.sendall(b"FILE\n" + file_name_bytes)
+
+                ##s.sendall(f"FILE\n{file_path.split('/')[-1]}")  #sin codificar
+                ##s.sendall(file_content)
+                s.close()
+                self.text_area.insert(tk.END, f"[You] Sent file: {file_path}\n")
+            except Exception as e:
+                print(f"An error occurred while sending file: {str(e)}")
+
+=======
+>>>>>>> 9dfa0a109eece096f7bac2e38bf47a64bb0708c9
 
 #opcione de recibir mensaje alternativa, falta solucionar la recepcion de ficheros (mejor formato binario)
 """""
