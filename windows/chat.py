@@ -86,20 +86,32 @@ class GUIChat(tk.Frame):
 class GUIPrincipal(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
-        usuarios = ListaUsuarios.get_lista()
+        self.parent = parent
         self.label = tk.Label(self, text="Hello world (GUIPrincipal)")
         self.label.grid(row=0, column=0, padx=5, pady=5)
 
         ###################################################################################################
         #boton de  de las redes disponibles
-        self.button_send_message = tk.Button(self, text="Escanear Lan", command=ListaUsuarios.get_lista().scan_lan)
+        self.button_send_message = tk.Button(self, text="Escanear Lan", command=self.scan_lan)
         self.button_send_message.grid(row=1, column=0, padx=5, pady=5)
         ###################################################################################################
 
         self.usuarios = tk.Frame(self)
         self.usuarios.grid(row=2, column=0, padx=5, pady=5)
+        usuarios = ListaUsuarios.get_lista()
         for (row, usuario) in enumerate(usuarios.usuarios):
             usuario_button = tk.Button(self.usuarios, text=usuario.nombre, command=lambda x=usuario.id: parent.seleccionar_usuario(x))
+            usuario_button.grid(row=row, column=0, padx=5, pady=5)
+    
+    def scan_lan(self):
+        self.usuarios.grid_forget()
+        self.usuarios = tk.Frame(self)
+        self.usuarios.grid(row=2, column=0, padx=5, pady=5)
+
+        usuarios = ListaUsuarios.get_lista()
+        usuarios.scan_lan()
+        for (row, usuario) in enumerate(usuarios.usuarios):
+            usuario_button = tk.Button(self.usuarios, text=usuario.nombre, command=lambda x=usuario.id: self.parent.seleccionar_usuario(x))
             usuario_button.grid(row=row, column=0, padx=5, pady=5)
 
 class MessageSenderApp(tk.Frame):

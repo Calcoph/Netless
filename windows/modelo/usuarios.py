@@ -114,11 +114,29 @@ class ListaUsuarios:
         return None
     
     def scan_lan(self):
+        usuarios_disponibles = []
         direcciones = discover()
+        # Añade los usuarios nuevos descubiertos
         for direccion in direcciones:
-            usuario = Usuario(str(self.counter), direccion.ip, direccion.mac)
-            self.usuarios.append(usuario)
-            self.counter += 1
+            id = direccion.mac
+            usuario_registrado = self.obtener_usuario(id)
+            if usuario_registrado is None:
+                usuario = Usuario(str(self.counter), direccion.ip, direccion.mac)
+                self.usuarios.append(usuario)
+                self.counter += 1
+                usuarios_disponibles.append(id)
+            else:
+                usuarios_disponibles.append(usuario_registrado.id)
+        
+        # Elimina los usuarios antiguos que no han respondido (ya no están disponibles)
+        indices_a_eliminar = []
+        for (i, usuario) in enumerate(self.usuarios):
+            if usuario.id not in usuarios_disponibles:
+                indices_a_eliminar.append(i)
+        # Se eliminan desde el final hacia el inicio para conservar los índices
+        indices_a_eliminar.reverse()
+        for i in indices_a_eliminar:
+            self.usuarios.pop(i)
 
 class Usuario:
     def __init__(self, nombre: str, ip: str, id: str) -> None:
