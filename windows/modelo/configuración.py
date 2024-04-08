@@ -31,3 +31,5 @@ class OpcionesUsuario:
     
     def cambiar_id(self, nuevo_id: str):
         self.id = nuevo_id
+        # TODO: Update database
+        print("ERROR: cambiar_id (OpcionesUsuario) no está terminado (mirar seq_cambiar_identificador para más detalles)")

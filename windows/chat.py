@@ -26,15 +26,27 @@ class GUIOpciones(tk.Frame):
 
         #Label y entradas alias
         self.label_alias = tk.Label(self, text="Alias:")
-        self.label_alias.grid(row=2, column=0, padx=5, pady=5)
+        self.label_alias.grid(row=1, column=0, padx=5, pady=5)
         self.entry_alias = tk.Entry(self, width=50)
-        self.entry_alias.grid(row=2, column=1, padx=5, pady=5)
+        self.entry_alias.grid(row=1, column=1, padx=5, pady=5)
+
+        #Label y entradas id
+        self.label_id = tk.Label(self, text="Id:")
+        self.label_id.grid(row=2, column=0, padx=5, pady=5)
+        self.entry_id = tk.Entry(self, width=50)
+        self.entry_id.grid(row=2, column=1, padx=5, pady=5)
 
     def cambiar_alias(self):
         nuevo_alias = self.entry_alias.get()
         self.mostrar_en_pantalla()
         opciones = OpcionesUsuario.get_opciones()
         opciones.cambiar_alias(nuevo_alias)
+    
+    def cambiar_id(self):
+        nuevo_id = self.entry_id.get()
+        self.mostrar_en_pantalla()
+        opciones = OpcionesUsuario.get_opciones()
+        opciones.cambiar_id(nuevo_id)
     
     def mostrar_en_pantalla(self):
         pass
