@@ -139,6 +139,11 @@ class GUIChat(tk.Frame):
         mensaje = self.entry_message.get()
         self.usuario.enviar_mensaje(mensaje)
 
+    def eliminar_de_whitelist(self):
+        id = self.usuario.obtener_id()
+        wl = Whitelist.get_whitelist()
+        wl.quitar_usuario(id)
+
     #al pulsar el botón enviar archivo se ejecuta esta función
     def send_file(self):
         destination_ip = self.usuario.ip
