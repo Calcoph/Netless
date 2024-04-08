@@ -1,6 +1,6 @@
-import sqlite3
 from __future__ import annotations
-from contracts import ChatContract, EnviableContract, EnviablesChatContract, FicheroContract, MensajeContract, OpcionesContract, UsuarioContract, WhiteListContract, Contract
+import sqlite3
+from .contracts import ChatContract, EnviableContract, EnviablesChatContract, FicheroContract, MensajeContract, OpcionesContract, UsuarioContract, WhiteListContract, Contract
 
 from ..configuración import OpcionesUsuario
 

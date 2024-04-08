@@ -1,7 +1,8 @@
+from __future__ import annotations
 from .database import DbHelper
 from .database.contracts import FicheroContract, EnviableContract, MensajeContract, UsuarioContract, ChatContract, EnviablesChatContract
 from .enviables import Enviable, Fichero, Mensaje, Dirección
-from __future__ import annotations
+from ..discover import discover
 
 class HistorialChat:
     def __init__(self) -> None:
@@ -82,7 +83,11 @@ class ListaUsuarios:
     LISTA: ListaUsuarios = None
     def __init__(self) -> None:
         if ListaUsuarios.LISTA is None:
+            direcciones = discover()
             self.usuarios: list[Usuario] = []
+            for (ident, direccion) in enumerate(direcciones):
+                usuario = Usuario(ident, direccion.ip, direccion.mac)
+                self.usuarios.append(usuario)
             self.LISTA = self
         else:
             raise SystemError

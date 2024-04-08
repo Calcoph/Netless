@@ -2,9 +2,11 @@ import tkinter as tk
 from tkinter import scrolledtext, filedialog
 import socket
 import threading
+from .modelo.usuarios import Usuario, ListaUsuarios
 
 # No sólo importa discover, si no que además inicializa el descubrimiento
-import discover
+from .discover import discover
+#se obtiene la IP del equipo y se busca en el /24 de esa dirección
 
 class Enum:
     pass
@@ -20,21 +22,21 @@ class VistaMensajes(tk.Frame):
         self.label.grid(row=0, column=0, padx=5, pady=5)
         self.label2 = tk.Label(self, text="chateando")
     
-    def cambiar_usuario(self, usuario):
+    def cambiar_usuario(self, usuario: Usuario):
         self.label2.grid_forget()
-        self.label2 = tk.Label(self, text=f"chateando con {usuario}")
+        self.label2 = tk.Label(self, text=f"chateando con {usuario.nombre}")
         self.label2.grid(row=1, column=0, padx=5, pady=5)
 
 class OtraVista(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
-        usuarios = ["usuario 1", "usuario 2", "usuario 3", "usuario 4", "usuario 5"]
+        usuarios = ListaUsuarios.get_lista()
         self.label = tk.Label(self, text="Hello world (OtraVista)")
         self.label.grid(row=0, column=0, padx=5, pady=5)
         self.usuarios = tk.Frame(self)
         self.usuarios.grid(row=1, column=0, padx=5, pady=5)
-        for (row, usuario) in enumerate(usuarios):
-            usuario_button = tk.Button(self.usuarios, text=usuario, command=lambda x=usuario: parent.seleccionar_usuario(x))
+        for (row, usuario) in enumerate(usuarios.usuarios):
+            usuario_button = tk.Button(self.usuarios, text=usuario.nombre, command=lambda x=usuario.id: parent.seleccionar_usuario(x))
             usuario_button.grid(row=row, column=0, padx=5, pady=5)
 
 class MessageSenderApp(tk.Frame):
@@ -94,8 +96,10 @@ class MessageSenderApp(tk.Frame):
         self.receiver_thread = threading.Thread(target=self.receive_messages, daemon=True)
         self.receiver_thread.start()
 
-    def seleccionar_usuario(self, usuario):
+    def seleccionar_usuario(self, id_usuario: str):
         self.vista_lista_usuarios.grid_forget()
+        usuarios = ListaUsuarios.get_lista()
+        usuario = usuarios.obtener_usuario(id_usuario)
         self.vista_mensajes.cambiar_usuario(usuario)
         self.vista_seleccionada = Vistas.MENSAJES
 
@@ -212,7 +216,7 @@ class MessageSenderApp(tk.Frame):
 """""
     
 
-if __name__ == "__main__":
+def iniciar():
     root = tk.Tk()
     app = MessageSenderApp(root)
     root.mainloop()

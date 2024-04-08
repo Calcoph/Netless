@@ -1,3 +1,6 @@
+Para iniciar la aplicación de escritorio:
+`python -m windows`
+
 ## Funcionalidades planificadas
 ### Obligatorias
 - [ ] Chat
