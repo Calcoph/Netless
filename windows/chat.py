@@ -61,12 +61,12 @@ class GUIChat(tk.Frame):
         self.label2.grid(row=1, column=0, padx=5, pady=5)
     
     def activar_envio(self):
-        self.button_send_message["state"] = "disabled"
-        self.button_send_file["state"] = "disabled"
-    
-    def desactivar_envio(self):
         self.button_send_message["state"] = "normal"
         self.button_send_file["state"] = "normal"
+    
+    def desactivar_envio(self):
+        self.button_send_message["state"] = "disabled"
+        self.button_send_file["state"] = "disabled"
     
     #al pulsar el botón enviar mensaje se ejecuta esta función
     def send_message(self):
