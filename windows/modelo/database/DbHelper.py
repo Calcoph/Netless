@@ -1,9 +1,7 @@
 from __future__ import annotations
 import sqlite3
 from .contracts import ChatContract, EnviableContract, EnviablesChatContract, FicheroContract, MensajeContract, OpcionesContract, UsuarioContract, WhiteListContract, Contract
-
-from ..configuración import OpcionesUsuario
-
+from ..crypt import generar_id_aleatorio
 
 DBType = str | int
 DBParameters = tuple[DBType] | dict[str, DBType]
@@ -57,7 +55,7 @@ class DbHelper:
         if len(self.cur.execute(f"SELECT * FROM {OpcionesContract.TABLE_NAME}").fetchall()) == 0:
             # No hay opciones
             # Hay que inicializar la tabla
-            id = OpcionesUsuario.generar_id_aleatorio()
+            id = generar_id_aleatorio()
             alias_por_defecto = "(Sin alias)"
             self.cur.execute(f"INSERT INTO {OpcionesContract.TABLE_NAME}({OpcionesContract.COLUMN_NAME_ID}, {OpcionesContract.COLUMN_NAME_ALIAS}) VALUES ({id}, {alias_por_defecto})");
 

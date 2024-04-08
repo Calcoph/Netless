@@ -63,7 +63,7 @@ class EnviablesChatContract(Contract):
     CREATE TABLE {TABLE_NAME} (
             {COLUMN_NAME_CHAT_ID} INTEGER,
             {COLUMN_NAME_ENV_ID} INTEGER,
-            CONSTRAINT prim_eky PRIMARY KEY ({COLUMN_NAME_CHAT_ID}, {COLUMN_NAME_ENV_ID})
+            CONSTRAINT prim_key PRIMARY KEY ({COLUMN_NAME_CHAT_ID}, {COLUMN_NAME_ENV_ID})
             CONSTRAINT fk_chat FOREIGN KEY ({COLUMN_NAME_CHAT_ID}) REFERENCES {ChatContract.TABLE_NAME} (_ID)
             CONSTRAINT fk_env FOREIGN KEY ({COLUMN_NAME_ENV_ID}) REFERENCES {EnviableContract.TABLE_NAME} (_ID)
     )"""

@@ -86,16 +86,13 @@ class ListaUsuarios:
             self.usuarios: list[Usuario] = []
             self.counter = 0
             self.LISTA = self
+            self.scan_lan()
         else:
             raise SystemError
-    
-    def init(self):
-        self.scan_lan()
-    
+
     def get_lista() -> ListaUsuarios:
         if ListaUsuarios.LISTA is None:
             ListaUsuarios.LISTA = ListaUsuarios()
-            ListaUsuarios.LISTA.init()
         return ListaUsuarios.LISTA
     
     def añadir_usuario(self, usr: Usuario):
@@ -125,8 +122,8 @@ class ListaUsuarios:
 
 class Usuario:
     def __init__(self, nombre: str, ip: str, id: str) -> None:
-        self.nombre = nombre,
-        self.ip = ip,
+        self.nombre = nombre
+        self.ip = ip
         self.chat = HistorialChat()
         self.id = id
     

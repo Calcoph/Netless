@@ -25,7 +25,7 @@ class Whitelist:
         ]
         where = f"{UsuarioContract.COLUMN_NAME_ID} = ?"
         where_values = (id,)
-        usr_id = db_helper.select(UsuarioContract.TABLE_NAME, column_names=columns, where=where, where_values=where_values).fetch_one
+        usr_id = db_helper.select(UsuarioContract.TABLE_NAME, column_names=columns, where=where, where_values=where_values).fetch_one()[0]
 
         columns = [
             WhiteListContract.COLUMN_NAME_USR_ID
