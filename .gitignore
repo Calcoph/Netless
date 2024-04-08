@@ -5,3 +5,5 @@
 /windows/NetLess.db
 /winenv
 */__pycache__
+*/*/__pycache__
+*/*/*/__pycache__

@@ -36,7 +36,7 @@ def get_ip_range() -> str:
     return ip
 
 
-def discover():
+def discover() -> list[Direccion]:
     ip_range = get_ip_range()
     devices = scan_lan(ip_range)
     print("Dispositivos en la LAN:")
@@ -45,7 +45,7 @@ def discover():
     return devices
 
 #se obtiene la IP del equipo y se busca en el /24 de esa dirección
-discover()
+#discover()
 
 # Imprime los dispositivos encontrados
 
