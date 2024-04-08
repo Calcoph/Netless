@@ -1,5 +1,3 @@
-import sqlite3
-
 class Contract:
     TABLE_NAME = ""
     SQL_CREATE_ENTRIES = ""

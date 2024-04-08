@@ -1,7 +1,7 @@
 from __future__ import annotations
-
-from database.DbHelper import DbHelper
-from database.contracts import UsuarioContract, WhiteListContract
+from .database.DbHelper import DbHelper
+from .database.contracts import UsuarioContract, WhiteListContract
+from .crypt import generar_claves, serializar_claves
 
 class Whitelist:
     LISTA: Whitelist = None
@@ -73,5 +73,7 @@ class OpcionesUsuario:
         self.id = nuevo_id
     
     def generar_id_aleatorio() -> str:
-        # TODO: No es aleatorio
-        return "93507297509234"
+        c_privada, c_publica = generar_claves()
+        c_privada, c_publica = serializar_claves(c_privada, c_publica)
+        c_publica = c_publica.decode()
+        return c_publica

@@ -1,6 +1,6 @@
-from database import DbHelper
-from database.contracts import FicheroContract, EnviableContract, MensajeContract, UsuarioContract, ChatContract, EnviablesChatContract
-from enviables import Enviable, Fichero, Mensaje, Dirección
+from .database import DbHelper
+from .database.contracts import FicheroContract, EnviableContract, MensajeContract, UsuarioContract, ChatContract, EnviablesChatContract
+from .enviables import Enviable, Fichero, Mensaje, Dirección
 from __future__ import annotations
 
 class HistorialChat:

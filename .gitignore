@@ -3,3 +3,5 @@
 /.vscode
 /env
 /windows/NetLess.db
+/winenv
+*/__pycache__
