@@ -163,8 +163,10 @@ class Usuario:
     def obtener_id(self) -> str:
         return self.id
     
-    def acepta_conexiones() -> bool:
-        raise NotImplemented
+    def acepta_conexiones(self) -> bool:
+        print("ERROR: acepta_conexiones no está implementado y devuelve siempre True")
+        return True
     
-    def solicitar_conexion() -> bool:
-        raise NotImplemented
+    def solicitar_conexion(self) -> bool:
+        print("ERROR: solicitar_conexion no está implementado y devuelve siempre True")
+        return True

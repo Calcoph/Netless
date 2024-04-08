@@ -34,7 +34,7 @@ def serializar_claves(clave_privada: RSAPrivateKey, clave_publica: RSAPublicKey)
         f.write(public_pem) """
 
 def encriptar_mensaje(clave_privada: RSAPrivateKey):
-    raise NotImplemented
+    raise NotImplementedError
     pass
 
 def generar_id_aleatorio() -> str:

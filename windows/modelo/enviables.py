@@ -33,7 +33,7 @@ class Enviable:
         self.dirección = dirección
 
     def mostrar_en_pantalla(self):
-        raise NotImplemented
+        raise NotImplementedError
     
     def get_fecha(self) -> datetime:
         return self.fecha
