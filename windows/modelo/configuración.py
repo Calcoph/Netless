@@ -26,8 +26,12 @@ class OpcionesUsuario:
 
     def cambiar_alias(self, nuevo_alias: str):
         self.alias = nuevo_alias
-        # TODO: Update database
-        print("ERROR: cambiar_alias (OpcionesUsuario) no está terminado (mirar seq_cambiar_alias para más detalles)")
+        db = DbHelper.get()
+        column_names = [
+            OpcionesContract.COLUMN_NAME_ALIAS
+        ]
+        column_values = (nuevo_alias,)
+        db.update(OpcionesContract.TABLE_NAME, column_names, column_values)
     
     def cambiar_id(self, nuevo_id: str):
         self.id = nuevo_id
