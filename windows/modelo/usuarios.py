@@ -83,18 +83,19 @@ class ListaUsuarios:
     LISTA: ListaUsuarios = None
     def __init__(self) -> None:
         if ListaUsuarios.LISTA is None:
-            direcciones = discover()
             self.usuarios: list[Usuario] = []
-            for (ident, direccion) in enumerate(direcciones):
-                usuario = Usuario(ident, direccion.ip, direccion.mac)
-                self.usuarios.append(usuario)
+            self.counter = 0
             self.LISTA = self
         else:
             raise SystemError
     
+    def init(self):
+        self.scan_lan()
+    
     def get_lista() -> ListaUsuarios:
         if ListaUsuarios.LISTA is None:
             ListaUsuarios.LISTA = ListaUsuarios()
+            ListaUsuarios.LISTA.init()
         return ListaUsuarios.LISTA
     
     def añadir_usuario(self, usr: Usuario):
@@ -114,6 +115,13 @@ class ListaUsuarios:
             if usuario.id == id:
                 return usuario
         return None
+    
+    def scan_lan(self):
+        direcciones = discover()
+        for direccion in direcciones:
+            usuario = Usuario(str(self.counter), direccion.ip, direccion.mac)
+            self.usuarios.append(usuario)
+            self.counter += 1
 
 class Usuario:
     def __init__(self, nombre: str, ip: str, id: str) -> None:
