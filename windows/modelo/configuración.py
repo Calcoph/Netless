@@ -26,6 +26,8 @@ class OpcionesUsuario:
 
     def cambiar_alias(self, nuevo_alias: str):
         self.alias = nuevo_alias
+        # TODO: Update database
+        print("ERROR: cambiar_alias (OpcionesUsuario) no está terminado (mirar seq_cambiar_alias para más detalles)")
     
     def cambiar_id(self, nuevo_id: str):
         self.id = nuevo_id

@@ -3,6 +3,8 @@ from tkinter import scrolledtext, filedialog
 import socket
 import threading
 from .modelo.usuarios import Usuario, ListaUsuarios
+from .modelo.whitelist import Whitelist
+from .modelo.configuración import OpcionesUsuario
 
 # No sólo importa discover, si no que además inicializa el descubrimiento
 from .discover import discover
@@ -14,6 +16,28 @@ class Enum:
 class Vistas(Enum):
     MENSAJES = 0
     USUARIOS = 1
+    OPCIONES = 2
+
+class GUIOpciones(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.label = tk.Label(self, text="Hello world (GUIOpciones)")
+        self.label.grid(row=0, column=0, padx=5, pady=5)
+
+        #Label y entradas alias
+        self.label_alias = tk.Label(self, text="Alias:")
+        self.label_alias.grid(row=2, column=0, padx=5, pady=5)
+        self.entry_alias = tk.Entry(self, width=50)
+        self.entry_alias.grid(row=2, column=1, padx=5, pady=5)
+
+    def cambiar_alias(self):
+        nuevo_alias = self.entry_alias.get()
+        self.mostrar_en_pantalla()
+        opciones = OpcionesUsuario.get_opciones()
+        opciones.cambiar_alias(nuevo_alias)
+    
+    def mostrar_en_pantalla(self):
+        pass
 
 class GUIChat(tk.Frame):
     def __init__(self, parent):
@@ -131,6 +155,9 @@ class GUIPrincipal(tk.Frame):
         for (row, usuario) in enumerate(usuarios.usuarios):
             usuario_button = tk.Button(self.usuarios, text=usuario.nombre, command=lambda x=usuario.id: self.parent.abrir_chat(x))
             usuario_button.grid(row=row, column=0, padx=5, pady=5)
+    
+    def aceptar_usuario(self, id_usuario: str):
+        Whitelist.añadir_usuario(id_usuario)
 
 class MessageSenderApp(tk.Frame):
     def __init__(self, root):
