@@ -82,6 +82,24 @@ class DbHelper:
 
         self.cur.execute(sql_string, value)
         return self.cur.lastrowid
+
+    def update(self, table_name: str, column_names: list[str], column_values: tuple[DBType], where: str="", where_values: DBParameters=None) -> int:
+        if len(column_names) == 0:
+            column_names_str = ""
+        else:
+            column_names_str = " SET"
+            for column_name in column_names:
+                column_names_str += column_name
+                column_names_str += " = ?"
+        sql_string = f"UPDATE {table_name}{column_names_str}"
+
+        values = column_values
+        if where != "":
+            sql_str += f"WHERE {where}"
+            values += where_values
+
+        self.cur.execute(sql_string, values)
+        return self.cur.lastrowid
     
     def select(self, table_name: str, column_names: list[str]=["*"], where: str="", where_values: DBParameters=None) -> SelectResult:
         if len(column_names) == 1:
