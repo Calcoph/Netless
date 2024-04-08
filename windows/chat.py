@@ -41,11 +41,32 @@ class GUIChat(tk.Frame):
         self.text_area = scrolledtext.ScrolledText(self, width=60, height=10)
         self.text_area.grid(row=4, columnspan=2, padx=5, pady=5)
     
-    def cambiar_usuario(self, usuario: Usuario):
+    def abrir_chat(self, id_usuario: str):
+        usuarios = ListaUsuarios.get_lista()
+        usuario = usuarios.obtener_usuario(id_usuario)
         self.usuario = usuario
+        acepta_conexiones = self.usuario.acepta_conexiones()
+        nombre = self.usuario.obtener_nombre()
+        chat = self.usuario.obtener_chat()
+        chat.mostrar_en_pantalla()
+        if acepta_conexiones:
+            self.activar_envio()
+        else:
+            self.desactivar_envio()
+            acepta_conexiones = self.usuario.solicitar_conexion()
+            if acepta_conexiones:
+                self.activar_envio()
         self.label2.grid_forget()
         self.label2 = tk.Label(self, text=f"chateando con {usuario.nombre}")
         self.label2.grid(row=1, column=0, padx=5, pady=5)
+    
+    def activar_envio(self):
+        self.button_send_message["state"] = "disabled"
+        self.button_send_file["state"] = "disabled"
+    
+    def desactivar_envio(self):
+        self.button_send_message["state"] = "normal"
+        self.button_send_file["state"] = "normal"
     
     #al pulsar el botón enviar mensaje se ejecuta esta función
     def send_message(self):
@@ -100,7 +121,7 @@ class GUIPrincipal(tk.Frame):
         self.usuarios.grid(row=2, column=0, padx=5, pady=5)
         usuarios = ListaUsuarios.get_lista()
         for (row, usuario) in enumerate(usuarios.usuarios):
-            usuario_button = tk.Button(self.usuarios, text=usuario.nombre, command=lambda x=usuario.id: parent.seleccionar_usuario(x))
+            usuario_button = tk.Button(self.usuarios, text=usuario.nombre, command=lambda x=usuario.id: parent.abrir_chat(x))
             usuario_button.grid(row=row, column=0, padx=5, pady=5)
     
     def scan_lan(self):
@@ -111,7 +132,7 @@ class GUIPrincipal(tk.Frame):
         usuarios = ListaUsuarios.get_lista()
         usuarios.scan_lan()
         for (row, usuario) in enumerate(usuarios.usuarios):
-            usuario_button = tk.Button(self.usuarios, text=usuario.nombre, command=lambda x=usuario.id: self.parent.seleccionar_usuario(x))
+            usuario_button = tk.Button(self.usuarios, text=usuario.nombre, command=lambda x=usuario.id: self.parent.abrir_chat(x))
             usuario_button.grid(row=row, column=0, padx=5, pady=5)
 
 class MessageSenderApp(tk.Frame):
@@ -135,30 +156,28 @@ class MessageSenderApp(tk.Frame):
 
         self.back_button = tk.Button(self, text="Volver a lista de usuarios", command=self.volver_a_lista_usuarios)
         self.vista_seleccionada = Vistas.USUARIOS
-        self.vista_lista_usuarios = GUIPrincipal(self)
-        self.vista_lista_usuarios.grid(row=7, column=0, padx=5, pady=5)
+        self.gui_principal = GUIPrincipal(self)
+        self.gui_principal.grid(row=7, column=0, padx=5, pady=5)
 
-        self.vista_mensajes = GUIChat(self)
+        self.gui_chat = GUIChat(self)
 
         #hilo de receptor
         self.receiver_thread = threading.Thread(target=self.receive_messages, daemon=True)
         self.receiver_thread.start()
 
-    def seleccionar_usuario(self, id_usuario: str):
-        self.vista_lista_usuarios.grid_forget()
-        usuarios = ListaUsuarios.get_lista()
-        usuario = usuarios.obtener_usuario(id_usuario)
-        self.vista_mensajes.cambiar_usuario(usuario)
+    def abrir_chat(self, id_usuario: str):
+        self.gui_principal.grid_forget()
+        self.gui_chat.abrir_chat(id_usuario)
         self.vista_seleccionada = Vistas.MENSAJES
 
         self.back_button.grid(row=6, column=0, padx=5, pady=5)
-        self.vista_mensajes.grid(row=7, column=0, padx=5, pady=5)
+        self.gui_chat.grid(row=7, column=0, padx=5, pady=5)
     
     def volver_a_lista_usuarios(self):
         self.vista_seleccionada = Vistas.USUARIOS
         self.back_button.grid_forget()
-        self.vista_mensajes.grid_forget()
-        self.vista_lista_usuarios.grid(row=7,column=0,padx=5,pady=5)
+        self.gui_chat.grid_forget()
+        self.gui_principal.grid(row=7,column=0,padx=5,pady=5)
     
     def receive_messages(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

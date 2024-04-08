@@ -163,8 +163,8 @@ class Usuario:
     def obtener_id(self) -> str:
         return self.id
     
-    def acepta_conexiones() -> bool:
-        raise NotImplemented
+    def acepta_conexiones(self) -> bool:
+        raise NotImplementedError
     
-    def solicitar_conexion() -> bool:
-        raise NotImplemented
+    def solicitar_conexion(self) -> bool:
+        raise NotImplementedError
