@@ -135,6 +135,10 @@ class GUIChat(tk.Frame):
     def seleccionar_fichero(self) -> File:
         raise NotImplementedError
 
+    def enviar_mensaje(self):
+        mensaje = self.entry_message.get()
+        self.usuario.enviar_mensaje(mensaje)
+
     #al pulsar el botón enviar archivo se ejecuta esta función
     def send_file(self):
         destination_ip = self.usuario.ip

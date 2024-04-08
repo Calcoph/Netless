@@ -153,6 +153,10 @@ class Usuario:
         tamaño = fichero.totalSpace
         fichero = Fichero(nombre, tamaño, Dirección(Dirección.Saliente))
         self.chat.añadir_fichero(fichero, id)
+
+    def enviar_mensaje(self, msg: str):
+        mens = Mensaje(msg, Dirección.Saliente)
+        self.chat.añadir_mensaje(mens)
     
     def obtener_nombre(self) -> str:
         return self.nombre
