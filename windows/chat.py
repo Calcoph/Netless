@@ -5,6 +5,7 @@ import threading
 from .modelo.usuarios import Usuario, ListaUsuarios
 from .modelo.whitelist import Whitelist
 from .modelo.configuración import OpcionesUsuario
+from .modelo.enviables import Fichero, Dirección
 
 # No sólo importa discover, si no que además inicializa el descubrimiento
 from .discover import discover
@@ -121,6 +122,18 @@ class GUIChat(tk.Frame):
             self.text_area.insert(tk.END, f"[You] {message}\n")
         except Exception as e:
             print(f"An error occurred while sending message: {str(e)}")
+    
+    def enviar_fichero(self):
+        fichero = self.seleccionar_fichero()
+        nombre = fichero.obtener_nombre()
+        tamaño = fichero.obtener_tamaño()
+
+        self.usuario.obtener_confirmacion(nombre, tamaño)
+        fichero = Fichero(nombre, tamaño, Dirección.Saliente)
+        self.usuario.enviar_fichero(fichero)
+    
+    def seleccionar_fichero(self) -> File:
+        raise NotImplementedError
 
     #al pulsar el botón enviar archivo se ejecuta esta función
     def send_file(self):
