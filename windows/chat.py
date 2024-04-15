@@ -222,9 +222,9 @@ class GUIChat(GenericGUI):
 
 
 
-class GUIPrincipal(tk.Frame):
+class GUIPrincipal(GenericGUI):
     def __init__(self, parent):
-        super().__init__(parent)
+        super().__init__(parent, row=1)
         self.parent = parent
         self.label = tk.Label(self, text="Hello world (GUIPrincipal)")
         self.label.grid(row=0, column=0, padx=5, pady=5)
@@ -265,10 +265,6 @@ class MessageSenderApp(tk.Frame):
 
         self.gui_chat = GUIChat(self)
         self.gui_opciones = GUIOpciones(self)
-
-        #hilo de receptor
-        self.receiver_thread = threading.Thread(target=self.receive_messages, daemon=True)
-        self.receiver_thread.start()
 
     def abrir_chat(self, id_usuario: str):
         self.gui_principal.hide()
