@@ -5,6 +5,9 @@ from tkinter import scrolledtext, filedialog
 import socket
 import threading
 from .modelo.usuarios import Usuario, ListaUsuarios
+from .modelo.whitelist import Whitelist
+from .modelo.configuración import OpcionesUsuario
+from .modelo.enviables import Fichero, Dirección
 
 # No sólo importa discover, si no que además inicializa el descubrimiento
 from .discover import discover
