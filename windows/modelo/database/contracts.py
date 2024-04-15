@@ -6,7 +6,7 @@ class Contract:
 class ChatContract(Contract):
     TABLE_NAME = "Chat"
     SQL_CREATE_ENTRIES = f"""CREATE TABLE {TABLE_NAME} (
-_ID INTEGER PRIMARY KEY,
+_ID INTEGER PRIMARY KEY
 )"""
     SQL_DELETE_ENTRIES = f"DROP TABLE IF EXISTS {TABLE_NAME}"
 
@@ -17,7 +17,7 @@ class FicheroContract(Contract):
     SQL_CREATE_ENTRIES = f"""
         CREATE TABLE {TABLE_NAME} (
             _ID INTEGER PRIMARY KEY,
-            {COLUMN_NAME_NOMBRE} TEXT,
+            {COLUMN_NAME_NOMBRE} TEXT
         )"""
     
     SQL_DELETE_ENTRIES = f"DROP TABLE IF EXISTS {TABLE_NAME}"
@@ -29,7 +29,7 @@ class MensajeContract(Contract):
     SQL_CREATE_ENTRIES = f"""
         CREATE TABLE {TABLE_NAME} (
             _ID INTEGER PRIMARY KEY,
-            {COLUMN_NAME_MENS} TEXT,
+            {COLUMN_NAME_MENS} TEXT
         )"""
     
     SQL_DELETE_ENTRIES = f"DROP TABLE IF EXISTS {TABLE_NAME}"
@@ -79,7 +79,7 @@ class OpcionesContract(Contract):
         CREATE TABLE {TABLE_NAME} (
             _ID INTEGER PRIMARY KEY,
             {COLUMN_NAME_ALIAS} TEXT,
-            {COLUMN_NAME_ID} TEXT,
+            {COLUMN_NAME_ID} TEXT
         )"""
     
     SQL_DELETE_ENTRIES = f"DROP TABLE IF EXISTS {TABLE_NAME}"
@@ -94,8 +94,8 @@ class UsuarioContract(Contract):
         CREATE TABLE {TABLE_NAME} (
             _ID INTEGER PRIMARY KEY,
             {COLUMN_NAME_ALIAS} TEXT,
-            {COLUMN_NAME_ID} TEXT
-            {COLUMN_NAME_CHAT_ID} INTEGER
+            {COLUMN_NAME_ID} TEXT,
+            {COLUMN_NAME_CHAT_ID} INTEGER,
             CONSTRAINT fk_chat FOREIGN KEY ({COLUMN_NAME_CHAT_ID}) REFERENCES {ChatContract.TABLE_NAME} (_ID)
         )"""
     

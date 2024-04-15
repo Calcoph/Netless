@@ -6,8 +6,8 @@ class Whitelist:
     LISTA: Whitelist = None
     def __init__(self) -> None:
         if Whitelist.LISTA is None:
+            Whitelist.LISTA = self
             self.lista_ids: list[str] = []
-            self.LISTA = self
         else:
             raise SystemError
     

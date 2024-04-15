@@ -49,31 +49,41 @@ class GUIOpciones(GenericGUI):
         self.label.grid(row=0, column=0, padx=5, pady=5)
 
         #Label y entradas alias
-        self.label_alias = tk.Label(self, text="Alias:")
+        self.label_alias = tk.Label(self, text=f"Alias: SI ESTÁS LEYENDO ESTO ALGO HA IDO MAL")
         self.label_alias.grid(row=1, column=0, padx=5, pady=5)
         self.entry_alias = tk.Entry(self, width=50)
         self.entry_alias.grid(row=1, column=1, padx=5, pady=5)
+        self.button_alias = tk.Button(self, text="Cambiar alias", command=self.cambiar_alias)
+        self.button_alias.grid(row=1, column=2, padx=5, pady=5)
 
         #Label y entradas id
-        self.label_id = tk.Label(self, text="Id:")
+        self.label_id = tk.Label(self, text=f"Id: SI ESTÁS LEYENDO ESTO ALGO HA IDO MAL")
         self.label_id.grid(row=2, column=0, padx=5, pady=5)
-        self.entry_id = tk.Entry(self, width=50)
-        self.entry_id.grid(row=2, column=1, padx=5, pady=5)
+        self.button_id = tk.Button(self, text="Generar un nuevo id", command=self.cambiar_id)
+        self.button_id.grid(row=2, column=1, padx=5, pady=5)
+
+        self.mostrar_en_pantalla()
 
     def cambiar_alias(self):
         nuevo_alias = self.entry_alias.get()
-        self.mostrar_en_pantalla()
         opciones = OpcionesUsuario.get_opciones()
         opciones.cambiar_alias(nuevo_alias)
+
+        self.mostrar_en_pantalla()
     
     def cambiar_id(self):
-        nuevo_id = self.entry_id.get()
-        self.mostrar_en_pantalla()
         opciones = OpcionesUsuario.get_opciones()
-        opciones.cambiar_id(nuevo_id)
+        opciones.cambiar_id()
+
+        self.mostrar_en_pantalla()
     
     def mostrar_en_pantalla(self):
-        pass
+        opciones = OpcionesUsuario.get_opciones()
+        alias = opciones.get_alias()
+        id = opciones.get_display_id()
+
+        self.label_alias.config(text=f"Alias: {alias}")
+        self.label_id.config(text=f"Id: {id}")
 
 class GUIChat(GenericGUI):
     def __init__(self, parent: MessageSenderApp):

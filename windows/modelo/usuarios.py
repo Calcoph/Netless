@@ -83,16 +83,16 @@ class ListaUsuarios:
     LISTA: ListaUsuarios = None
     def __init__(self) -> None:
         if ListaUsuarios.LISTA is None:
+            ListaUsuarios.LISTA = self
             self.usuarios: list[Usuario] = []
             self.counter = 0
-            self.LISTA = self
             self.scan_lan()
         else:
             raise SystemError
 
     def get_lista() -> ListaUsuarios:
         if ListaUsuarios.LISTA is None:
-            ListaUsuarios.LISTA = ListaUsuarios()
+            ListaUsuarios()
         return ListaUsuarios.LISTA
     
     def añadir_usuario(self, usr: Usuario):
