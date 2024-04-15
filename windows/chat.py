@@ -91,9 +91,39 @@ class GUIChat(tk.Frame):
 
         while True:
             conn, addr = s.accept()
+            
+            with conn:
+
+                #se selecciona el tipo a recibir
+                data = conn.recv(1024)
+                message_type, *rest = data.decode('utf-8').split('\n')
+
+                if message_type == 'TEXT':
+                        message = '\n'.join(rest)
+                        self.text_area.insert(tk.END, f"[{addr[0]}] {message}\n")
+
+                elif message_type == 'FILE':
+                        file_name = rest[0]
+                        print(file_name)
+                        with open(file_name, 'wb') as file:
+                            while True:
+                                data = conn.recv(1024)
+                                if not data:
+                                    break
+                                file.write(data)
+                                file.write(conn.recv(1024))
+                        self.text_area.insert(tk.END, f"[{addr[0]}] Received file: {file_name}\n")
+                        break
+
+
+
+        """"
+        while True:
+            conn, addr = s.accept()
             with conn:
                 while True:
                     data = conn.recv(1024)
+                    print(data)
                     if not data:
                         break
                     message_type, *rest = data.decode('utf-8').split('\n')
@@ -104,9 +134,22 @@ class GUIChat(tk.Frame):
                     elif message_type == 'FILE':
                         file_name = rest[0]
                         with open(file_name, 'wb') as file:
-                            file.write(conn.recv(1024))
+                            while True:
+                                data = conn.recv(1024)
+                                if not data:
+                                    break
+                                file.write(data)
+                                file.write(conn.recv(1024))
                         self.text_area.insert(tk.END, f"[{addr[0]}] Received file: {file_name}\n")
                         break
+                        """
+        
+
+
+
+
+
+
 class GUIPrincipal(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
