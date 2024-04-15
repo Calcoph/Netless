@@ -1,8 +1,13 @@
+from __future__ import annotations
+
 import tkinter as tk
 from tkinter import scrolledtext, filedialog
 import socket
 import threading
 from .modelo.usuarios import Usuario, ListaUsuarios
+from .modelo.whitelist import Whitelist
+from .modelo.configuración import OpcionesUsuario
+from .modelo.enviables import Fichero, Dirección
 
 # No sólo importa discover, si no que además inicializa el descubrimiento
 from .discover import discover
@@ -14,10 +19,75 @@ class Enum:
 class Vistas(Enum):
     MENSAJES = 0
     USUARIOS = 1
+    OPCIONES = 2
 
-class GUIChat(tk.Frame):
-    def __init__(self, parent):
+class GenericGUI(tk.Frame):
+    def __init__(self, parent, row: int, column: int=0, padx: int=5, pady: int=5):
         super().__init__(parent)
+        self.parent = parent
+        self.row = row
+        self.column = column
+        self.padx = padx
+        self.pady = pady
+    
+    def show(self):
+        self.grid(row=self.row, column=self.column, padx=self.padx, pady=self.pady)
+
+    def hide(self):
+        self.grid_forget()
+    
+    def destroy_children(self) -> GenericGUI:
+        self.hide()
+        new_instance = GenericGUI(self.parent, self.row, self.column, self.padx, self.pady)
+        new_instance.show()
+        return new_instance
+
+class GUIOpciones(GenericGUI):
+    def __init__(self, parent: MessageSenderApp):
+        super().__init__(parent, row=2)
+        self.label = tk.Label(self, text="Hello world (GUIOpciones)")
+        self.label.grid(row=0, column=0, padx=5, pady=5)
+
+        #Label y entradas alias
+        self.label_alias = tk.Label(self, text=f"Alias: SI ESTÁS LEYENDO ESTO ALGO HA IDO MAL")
+        self.label_alias.grid(row=1, column=0, padx=5, pady=5)
+        self.entry_alias = tk.Entry(self, width=50)
+        self.entry_alias.grid(row=1, column=1, padx=5, pady=5)
+        self.button_alias = tk.Button(self, text="Cambiar alias", command=self.cambiar_alias)
+        self.button_alias.grid(row=1, column=2, padx=5, pady=5)
+
+        #Label y entradas id
+        self.label_id = tk.Label(self, text=f"Id: SI ESTÁS LEYENDO ESTO ALGO HA IDO MAL")
+        self.label_id.grid(row=2, column=0, padx=5, pady=5)
+        self.button_id = tk.Button(self, text="Generar un nuevo id", command=self.cambiar_id)
+        self.button_id.grid(row=2, column=1, padx=5, pady=5)
+
+        self.mostrar_en_pantalla()
+
+    def cambiar_alias(self):
+        nuevo_alias = self.entry_alias.get()
+        opciones = OpcionesUsuario.get_opciones()
+        opciones.cambiar_alias(nuevo_alias)
+
+        self.mostrar_en_pantalla()
+    
+    def cambiar_id(self):
+        opciones = OpcionesUsuario.get_opciones()
+        opciones.cambiar_id()
+
+        self.mostrar_en_pantalla()
+    
+    def mostrar_en_pantalla(self):
+        opciones = OpcionesUsuario.get_opciones()
+        alias = opciones.get_alias()
+        id = opciones.get_display_id()
+
+        self.label_alias.config(text=f"Alias: {alias}")
+        self.label_id.config(text=f"Id: {id}")
+
+class GUIChat(GenericGUI):
+    def __init__(self, parent: MessageSenderApp):
+        super().__init__(parent, row=2)
         self.label = tk.Label(self, text="Hello world (GUIChat)")
         self.label.grid(row=0, column=0, padx=5, pady=5)
         self.label2 = tk.Label(self, text="ESTE MENSAJE NO DEBERÍA SER POSIBLE VERLO, ALGO HA SALIDO MAL (GUIChat)")
@@ -49,6 +119,8 @@ class GUIChat(tk.Frame):
         self.label2.grid_forget()
         self.label2 = tk.Label(self, text=f"chateando con {usuario.nombre}")
         self.label2.grid(row=1, column=0, padx=5, pady=5)
+
+        self.show()
     
     #al pulsar el botón enviar mensaje se ejecuta esta función
     def send_message(self):
@@ -157,20 +229,21 @@ class GUIPrincipal(tk.Frame):
         self.label = tk.Label(self, text="Hello world (GUIPrincipal)")
         self.label.grid(row=0, column=0, padx=5, pady=5)
 
-        self.button_send_message = tk.Button(self, text="Escanear Lan", command=self.scan_lan)
-        self.button_send_message.grid(row=1, column=0, padx=5, pady=5)
+        self.button_opciones = tk.Button(self, text="Opciones", command=self.parent.abrir_opciones)
+        self.button_opciones.grid(row=1, column=0, padx=5, pady=5)
 
-        self.usuarios = tk.Frame(self)
-        self.usuarios.grid(row=2, column=0, padx=5, pady=5)
+        self.button_escanear_lan = tk.Button(self, text="Escanear Lan", command=self.scan_lan)
+        self.button_escanear_lan.grid(row=2, column=0, padx=5, pady=5)
+
+        self.usuarios = GenericGUI(self, row=3)
+        self.usuarios.show()
         usuarios = ListaUsuarios.get_lista()
         for (row, usuario) in enumerate(usuarios.usuarios):
             usuario_button = tk.Button(self.usuarios, text=usuario.ip, command=lambda x=usuario.id: parent.seleccionar_usuario(x))
             usuario_button.grid(row=row, column=0, padx=5, pady=5)
-    
+
     def scan_lan(self):
-        self.usuarios.grid_forget()
-        self.usuarios = tk.Frame(self)
-        self.usuarios.grid(row=2, column=0, padx=5, pady=5)
+        self.usuarios = self.usuarios.destroy_children()
 
         usuarios = ListaUsuarios.get_lista()
         usuarios.scan_lan()
@@ -187,27 +260,36 @@ class MessageSenderApp(tk.Frame):
 
         self.back_button = tk.Button(self, text="Volver a lista de usuarios", command=self.volver_a_lista_usuarios)
         self.vista_seleccionada = Vistas.USUARIOS
-        self.vista_lista_usuarios = GUIPrincipal(self)
-        self.vista_lista_usuarios.grid(row=7, column=0, padx=5, pady=5)
+        self.gui_principal = GUIPrincipal(self)
+        self.gui_principal.grid(row=1, column=0, padx=5, pady=5)
 
-        self.vista_mensajes = GUIChat(self)
-        
+        self.gui_chat = GUIChat(self)
+        self.gui_opciones = GUIOpciones(self)
 
-    def seleccionar_usuario(self, id_usuario: str):
-        self.vista_lista_usuarios.grid_forget()
-        usuarios = ListaUsuarios.get_lista()
-        usuario = usuarios.obtener_usuario(id_usuario)
-        self.vista_mensajes.cambiar_usuario(usuario)
+        #hilo de receptor
+        self.receiver_thread = threading.Thread(target=self.receive_messages, daemon=True)
+        self.receiver_thread.start()
+
+    def abrir_chat(self, id_usuario: str):
+        self.gui_principal.hide()
+        self.gui_chat.abrir_chat(id_usuario)
         self.vista_seleccionada = Vistas.MENSAJES
 
-        self.back_button.grid(row=6, column=0, padx=5, pady=5)
-        self.vista_mensajes.grid(row=7, column=0, padx=5, pady=5)
+        self.back_button.grid(row=1, column=0, padx=5, pady=5)
     
     def volver_a_lista_usuarios(self):
         self.vista_seleccionada = Vistas.USUARIOS
         self.back_button.grid_forget()
-        self.vista_mensajes.grid_forget()
-        self.vista_lista_usuarios.grid(row=7,column=0,padx=5,pady=5)
+        self.gui_chat.hide()
+        self.gui_opciones.hide()
+        self.gui_principal.show()
+    
+    def abrir_opciones(self):
+        self.gui_principal.hide()
+        self.vista_seleccionada = Vistas.OPCIONES
+
+        self.back_button.grid(row=1, column=0, padx=5, pady=5)
+        self.gui_opciones.show()
     
     
 
