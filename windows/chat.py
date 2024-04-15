@@ -307,8 +307,10 @@ class MessageSenderApp(tk.Frame):
         self.gui_opciones = GUIOpciones(self)
 
     def abrir_chat(self, id_usuario: str):
+        usuarios = ListaUsuarios.get_lista()
+        usuario = usuarios.obtener_usuario(id_usuario)
         self.gui_principal.hide()
-        self.gui_chat.abrir_chat(id_usuario)
+        self.gui_chat.abrir_chat(usuario)
         self.vista_seleccionada = Vistas.MENSAJES
 
         self.back_button.grid(row=1, column=0, padx=5, pady=5)
