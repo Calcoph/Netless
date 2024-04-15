@@ -41,3 +41,9 @@ class OpcionesUsuario:
         ]
         column_values = (nuevo_id,)
         db.update(OpcionesContract.TABLE_NAME, column_names, column_values)
+
+    def get_alias(self) -> str:
+        self.alias
+
+    def get_id(self) -> str:
+        self.id
