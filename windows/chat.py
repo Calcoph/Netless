@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import tkinter as tk
 from tkinter import scrolledtext, filedialog
 import socket
@@ -19,9 +21,30 @@ class Vistas(Enum):
     USUARIOS = 1
     OPCIONES = 2
 
-class GUIOpciones(tk.Frame):
-    def __init__(self, parent):
+class GenericGUI(tk.Frame):
+    def __init__(self, parent, row: int, column: int=0, padx: int=5, pady: int=5):
         super().__init__(parent)
+        self.parent = parent
+        self.row = row
+        self.column = column
+        self.padx = padx
+        self.pady = pady
+    
+    def show(self):
+        self.grid(row=self.row, column=self.column, padx=self.padx, pady=self.pady)
+
+    def hide(self):
+        self.grid_forget()
+    
+    def destroy_children(self) -> GenericGUI:
+        self.hide()
+        new_instance = GenericGUI(self.parent, self.row, self.column, self.padx, self.pady)
+        new_instance.show()
+        return new_instance
+
+class GUIOpciones(GenericGUI):
+    def __init__(self, parent: MessageSenderApp):
+        super().__init__(parent, row=2)
         self.label = tk.Label(self, text="Hello world (GUIOpciones)")
         self.label.grid(row=0, column=0, padx=5, pady=5)
 
@@ -52,9 +75,9 @@ class GUIOpciones(tk.Frame):
     def mostrar_en_pantalla(self):
         pass
 
-class GUIChat(tk.Frame):
-    def __init__(self, parent):
-        super().__init__(parent)
+class GUIChat(GenericGUI):
+    def __init__(self, parent: MessageSenderApp):
+        super().__init__(parent, row=2)
         self.label = tk.Label(self, text="Hello world (GUIChat)")
         self.label.grid(row=0, column=0, padx=5, pady=5)
         self.label2 = tk.Label(self, text="ESTE MENSAJE NO DEBERÍA SER POSIBLE VERLO, ALGO HA SALIDO MAL (GUIChat)")
@@ -96,6 +119,8 @@ class GUIChat(tk.Frame):
         self.label2.grid_forget()
         self.label2 = tk.Label(self, text=f"chateando con {usuario.nombre}")
         self.label2.grid(row=1, column=0, padx=5, pady=5)
+
+        self.show()
     
     def activar_envio(self):
         self.button_send_message["state"] = "normal"
@@ -162,27 +187,28 @@ class GUIChat(tk.Frame):
             except Exception as e:
                 print(f"An error occurred while sending file: {str(e)}")
 
-class GUIPrincipal(tk.Frame):
-    def __init__(self, parent):
-        super().__init__(parent)
+class GUIPrincipal(GenericGUI):
+    def __init__(self, parent: MessageSenderApp):
+        super().__init__(parent, row=1)
         self.parent = parent
         self.label = tk.Label(self, text="Hello world (GUIPrincipal)")
         self.label.grid(row=0, column=0, padx=5, pady=5)
 
-        self.button_send_message = tk.Button(self, text="Escanear Lan", command=self.scan_lan)
-        self.button_send_message.grid(row=1, column=0, padx=5, pady=5)
+        self.button_opciones = tk.Button(self, text="Opciones", command=self.parent.abrir_opciones)
+        self.button_opciones.grid(row=1, column=0, padx=5, pady=5)
 
-        self.usuarios = tk.Frame(self)
-        self.usuarios.grid(row=2, column=0, padx=5, pady=5)
+        self.button_escanear_lan = tk.Button(self, text="Escanear Lan", command=self.scan_lan)
+        self.button_escanear_lan.grid(row=2, column=0, padx=5, pady=5)
+
+        self.usuarios = GenericGUI(self, row=3)
+        self.usuarios.show()
         usuarios = ListaUsuarios.get_lista()
         for (row, usuario) in enumerate(usuarios.usuarios):
             usuario_button = tk.Button(self.usuarios, text=usuario.nombre, command=lambda x=usuario.id: parent.abrir_chat(x))
             usuario_button.grid(row=row, column=0, padx=5, pady=5)
-    
+
     def scan_lan(self):
-        self.usuarios.grid_forget()
-        self.usuarios = tk.Frame(self)
-        self.usuarios.grid(row=2, column=0, padx=5, pady=5)
+        self.usuarios = self.usuarios.destroy_children()
 
         usuarios = ListaUsuarios.get_lista()
         usuarios.scan_lan()
@@ -203,27 +229,35 @@ class MessageSenderApp(tk.Frame):
         self.back_button = tk.Button(self, text="Volver a lista de usuarios", command=self.volver_a_gui_principal)
         self.vista_seleccionada = Vistas.USUARIOS
         self.gui_principal = GUIPrincipal(self)
-        self.gui_principal.grid(row=7, column=0, padx=5, pady=5)
+        self.gui_principal.grid(row=1, column=0, padx=5, pady=5)
 
         self.gui_chat = GUIChat(self)
+        self.gui_opciones = GUIOpciones(self)
 
         #hilo de receptor
         self.receiver_thread = threading.Thread(target=self.receive_messages, daemon=True)
         self.receiver_thread.start()
 
     def abrir_chat(self, id_usuario: str):
-        self.gui_principal.grid_forget()
+        self.gui_principal.hide()
         self.gui_chat.abrir_chat(id_usuario)
         self.vista_seleccionada = Vistas.MENSAJES
 
-        self.back_button.grid(row=6, column=0, padx=5, pady=5)
-        self.gui_chat.grid(row=7, column=0, padx=5, pady=5)
+        self.back_button.grid(row=1, column=0, padx=5, pady=5)
     
     def volver_a_gui_principal(self):
         self.vista_seleccionada = Vistas.USUARIOS
         self.back_button.grid_forget()
-        self.gui_chat.grid_forget()
-        self.gui_principal.grid(row=7,column=0,padx=5,pady=5)
+        self.gui_chat.hide()
+        self.gui_opciones.hide()
+        self.gui_principal.show()
+    
+    def abrir_opciones(self):
+        self.gui_principal.hide()
+        self.vista_seleccionada = Vistas.OPCIONES
+
+        self.back_button.grid(row=1, column=0, padx=5, pady=5)
+        self.gui_opciones.show()
     
     def receive_messages(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
