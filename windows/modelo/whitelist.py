@@ -1,6 +1,6 @@
+from __future__ import annotations
 from .database.DbHelper import DbHelper
 from .database.contracts import UsuarioContract, WhiteListContract
-from __future__ import annotations
 
 class Whitelist:
     LISTA: Whitelist = None

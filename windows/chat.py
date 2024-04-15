@@ -132,7 +132,7 @@ class GUIChat(tk.Frame):
         fichero = Fichero(nombre, tamaño, Dirección.Saliente)
         self.usuario.enviar_fichero(fichero)
     
-    def seleccionar_fichero(self) -> File:
+    def seleccionar_fichero(self):# -> File:
         raise NotImplementedError
 
     def enviar_mensaje(self):
@@ -200,7 +200,7 @@ class MessageSenderApp(tk.Frame):
         self.root = root
         self.root.title("Netless")
 
-        self.back_button = tk.Button(self, text="Volver a lista de usuarios", command=self.volver_a_lista_usuarios)
+        self.back_button = tk.Button(self, text="Volver a lista de usuarios", command=self.volver_a_gui_principal)
         self.vista_seleccionada = Vistas.USUARIOS
         self.gui_principal = GUIPrincipal(self)
         self.gui_principal.grid(row=7, column=0, padx=5, pady=5)
@@ -219,7 +219,7 @@ class MessageSenderApp(tk.Frame):
         self.back_button.grid(row=6, column=0, padx=5, pady=5)
         self.gui_chat.grid(row=7, column=0, padx=5, pady=5)
     
-    def volver_a_lista_usuarios(self):
+    def volver_a_gui_principal(self):
         self.vista_seleccionada = Vistas.USUARIOS
         self.back_button.grid_forget()
         self.gui_chat.grid_forget()
