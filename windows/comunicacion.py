@@ -59,6 +59,32 @@ class RespuestaPermisoArchivo:
         raise NotImplementedError
         return Cabecera(None, TipoMensaje.PEDIR_IDENTIFICACION, 0).to_bytes()
 
+class Texto:
+    def __init__(self, data: bytes | None, mensaje: str) -> None:
+        self.mensaje = str
+
+    def from_bytes(data: bytes) -> Texto:
+        cursor = 0
+        tamaño_mensaje = data[cursor:cursor+2] # 2 bytes: tamaño del mensaje
+        cursor += 2
+        mensaje = data[cursor:cursor+tamaño_mensaje].decode("utf-8")
+        cursor += tamaño_mensaje
+
+        return Texto(data, mensaje)
+
+class Fichero:
+    def __init__(self, data: bytes | None, mensaje: str, contenido) -> None:
+        self.nombre = str
+        self.mensaje
+
+    def from_bytes(data: bytes) -> Fichero:
+        cursor = 0
+        tamaño_mensaje = data[cursor:cursor+2] # 2 bytes: tamaño del mensaje
+        cursor += 2
+        mensaje = data[cursor:cursor+tamaño_mensaje].decode("utf-8")
+        cursor += tamaño_mensaje
+
+        return Fichero(data, mensaje)
 class CabeceraFichero:
     TAMAÑO_MINIMO: int = 4
     def __init__(self, data: bytes | None, metadata: str) -> None:
