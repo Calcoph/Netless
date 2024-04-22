@@ -2,7 +2,7 @@ from __future__ import annotations
 from .database import DbHelper
 from .database.contracts import FicheroContract, EnviableContract, MensajeContract, UsuarioContract, ChatContract, EnviablesChatContract
 from .enviables import Enviable, Fichero, Mensaje, Dirección
-from ..discover import discover
+from ..comunicacion import discover
 
 class HistorialChat:
     def __init__(self) -> None:

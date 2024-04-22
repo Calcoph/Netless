@@ -1,8 +1,14 @@
 from __future__ import annotations
 
-from socket import socket
+from queue import Queue
+import socket
+import threading
+import time
 
-from .chat import Enum
+from .discover import Direccion, get_ip_range, scan_lan
+
+class Enum:
+    pass
 
 class TipoMensaje(Enum):
     TEXTO = 0x00
@@ -17,7 +23,7 @@ class CabeceraFichero:
         self.data = data
         self.metadata = metadata
     
-    def read_from_socket(conn: socket) -> CabeceraFichero:
+    def read_from_socket(conn: socket.socket) -> CabeceraFichero:
         data = conn.recv(CabeceraFichero.TAMAÑO_MINIMO)
         cursor = 0
         metadata_size = data[cursor:cursor+4]
@@ -40,12 +46,12 @@ class Cabecera:
         self.type = type
         self.message_size = message_size
 
-    def read_from_socket(conn: socket) -> Cabecera:
+    def read_from_socket(conn: socket.socket) -> Cabecera:
         data = conn.recv(Cabecera.TAMAÑO)
         cursor = 0
         type = data[cursor] # 1 byte: tipo
         cursor += 1
-        message_size = data[cursor:cursor+4] # 4 bytes: tamaño del cuerpo
+        message_size = int.from_bytes(data[cursor:cursor+4]) # 4 bytes: tamaño del cuerpo
         # Tamaño máximo de mensaje: casi 4 GiB
         cursor += 4
         return Cabecera(data, type, message_size)
@@ -100,5 +106,72 @@ class PedirIdentificacion:
     def to_bytes(self) -> bytes:
         return bytes()
     
-    def butes_con_cabecera(self) -> bytes:
+    def bytes_con_cabecera(self) -> bytes:
         return Cabecera(None, TipoMensaje.PEDIR_IDENTIFICACION, 0).to_bytes()
+
+def discover() -> list[Identificacion]:
+    ip_range = get_ip_range()
+    devices = scan_lan(ip_range)
+    print("Dispositivos en la LAN:")
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind(("0.0.0.0", 12345))
+    sock.listen(len(devices))
+    send_threads: list[threading.Thread] = []
+    stdout_lock = threading.Lock()
+    for device in devices:
+        print(f"IP: {device.ip}, MAC: {device.mac}")
+        th = threading.Thread(target=lambda : pedir_identificacion(device, stdout_lock))
+        th.start()
+        send_threads.append(th)
+    for th in send_threads:
+        th.join(5.0)
+    print("joined all")
+    q = Queue()
+    identificaciones = []
+    th = threading.Thread(target=lambda : response_listener(sock, q, identificaciones))
+    th.start()
+
+    time.sleep(5)
+    q.put(True)
+    th.join(5.0)
+    if th.is_alive():
+        print("Didn't end")
+    th.join()
+
+    return identificaciones
+
+def pedir_identificacion(device: Direccion, stdout_lock: threading.Lock):
+    send_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    send_sock.settimeout(3.0)
+    try:
+        send_sock.connect((device.ip, 12345))
+        send_sock.sendall(PedirIdentificacion().bytes_con_cabecera())
+    except ConnectionRefusedError:
+        stdout_lock.acquire(timeout=1.0)
+        print(f"{device.ip}: Ese dispositivo no acepta el protocolo")
+        stdout_lock.release()
+    except TimeoutError:
+        stdout_lock.acquire(timeout=1.0)
+        print(f"{device.ip}: Timeout")
+        stdout_lock.release()
+
+def response_listener(sock: socket.socket, q: Queue, identificaciones: list[Identificacion]):
+    sock.setblocking(False)
+    sock.settimeout(3.0)
+    while q.empty():
+        try:
+            (con, addr) = sock.accept()
+            cabecera: Cabecera = Cabecera.read_from_socket(con)
+            print(cabecera.message_size)
+            if cabecera.type == TipoMensaje.IDENTIFICACION:
+                if cabecera.message_size == 0:
+                    # Un mensaje de tipo identificación tiene que tener cuerpo
+                    continue
+                cuerpo = con.recv(cabecera.message_size)
+                identificacion = Identificacion.from_bytes(cuerpo)
+                identificaciones.append(identificacion)
+        except TimeoutError:
+            # Es para que de vez en cuando mire q.empty()
+            pass
+
+    return identificaciones

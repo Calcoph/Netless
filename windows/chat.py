@@ -253,12 +253,6 @@ class GUIChat(GenericGUI):
                         break
                         """
         
-
-
-
-
-
-
 class GUIPrincipal(GenericGUI):
     def __init__(self, parent: MessageSenderApp):
         super().__init__(parent, row=1)
