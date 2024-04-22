@@ -5,6 +5,8 @@ import socket
 import threading
 import time
 
+from .modelo.configuración import OpcionesUsuario
+
 from .discover import Direccion, get_ip_range, scan_lan
 
 class Enum:
@@ -16,6 +18,46 @@ class TipoMensaje(Enum):
     CONTINUACION_FICHERO = 0x02
     IDENTIFICACION = 0x03
     PEDIR_IDENTIFICACION = 0x04
+    SOLICITAR_PERMISO_ARCHIVO = 0x05
+    RESPUESTA_PERMISO_ARCHIVO = 0x06
+
+class SolicitarPermisoArchivo:
+    def __init__(self) -> None:
+        raise NotImplementedError
+        pass
+
+    def from_bytes(data: bytes) -> PedirIdentificacion:
+        raise NotImplementedError
+        if len(data) > 0:
+            raise Exception("SolicitarPermisoArchivo es un mensaje de tamaño 0")
+        return PedirIdentificacion()
+
+    def to_bytes(self) -> bytes:
+        raise NotImplementedError
+        return bytes()
+    
+    def bytes_con_cabecera(self) -> bytes:
+        raise NotImplementedError
+        return Cabecera(None, TipoMensaje.PEDIR_IDENTIFICACION, 0).to_bytes()
+
+class RespuestaPermisoArchivo:
+    def __init__(self) -> None:
+        raise NotImplementedError
+        pass
+
+    def from_bytes(data: bytes) -> PedirIdentificacion:
+        raise NotImplementedError
+        if len(data) > 0:
+            raise Exception("RespuestaPermisoArchivo es un mensaje de tamaño 0")
+        return PedirIdentificacion()
+
+    def to_bytes(self) -> bytes:
+        raise NotImplementedError
+        return bytes()
+    
+    def bytes_con_cabecera(self) -> bytes:
+        raise NotImplementedError
+        return Cabecera(None, TipoMensaje.PEDIR_IDENTIFICACION, 0).to_bytes()
 
 class CabeceraFichero:
     TAMAÑO_MINIMO: int = 4
@@ -175,3 +217,14 @@ def response_listener(sock: socket.socket, q: Queue, identificaciones: list[Iden
             pass
 
     return identificaciones
+
+def responder_identificacion(ip: str):
+    """Asumimos que hemos recibido un mensaje PedirIdenificacion"""
+    opciones = OpcionesUsuario.get_opciones()
+    alias = opciones.get_alias()
+    id = opciones.get_display_id()
+    mensaje = Identificacion(None, alias, id)
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((ip, 12345))
+    sock.sendall(mensaje.bytes_con_cabecera())
