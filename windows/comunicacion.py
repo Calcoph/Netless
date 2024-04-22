@@ -100,5 +100,86 @@ class PedirIdentificacion:
     def to_bytes(self) -> bytes:
         return bytes()
     
-    def butes_con_cabecera(self) -> bytes:
+    def bytes_con_cabecera(self) -> bytes:
         return Cabecera(None, TipoMensaje.PEDIR_IDENTIFICACION, 0).to_bytes()
+
+class Comunicacion:
+
+    def __init__(self) -> None:
+        pass
+
+    def enviar_mensaje(self, usuario, chat, mensaje: str):
+        
+        destination_ip = usuario.ip
+        message = chat.entry_message.get()
+        
+        #se cofigura un socket para el envío
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((destination_ip, 12345))
+            #s.sendall(f"TEXT\n{message}".encode('utf-8'))
+
+
+            #se crea la cabecera
+            cabecera = Cabecera()
+            cabecera.to_bytes()
+            
+            #se envía el contenido del paquete
+            s.sendall(cabecera)
+            
+            s.close()
+            
+            #self.text_area.insert(tk.END, f"[You] {message}\n")
+        except Exception as e:
+            print(f"An error occurred while sending message: {str(e)}")
+
+    def send_file(self):
+        destination_ip = self.usuario.ip
+        #a diferencia de send_message el archivo se obtiene de una ventana emergente
+        
+
+        #guichat llama esta función para enviar mensaje/archivo
+        #file_path = filedialog.askopenfilename()
+        if file_path:
+            try:
+                with open(file_path, 'rb') as file:
+                    file_content = file.read()
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect((destination_ip, 12345))  # se lee el archivo y se envía por el socket
+                s.sendall(f"FILE\n{file_path.split('/')[-1]}".encode('utf-8'))
+                s.sendall(file_content)
+                s.close()
+                self.text_area.insert(tk.END, f"[You] Sent file: {file_path}\n")
+            except Exception as e:
+                print(f"An error occurred while sending file: {str(e)}")
+    
+    def receive_messages(self,):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.bind(('0.0.0.0', 12345)) 
+        s.listen(1)
+
+        while True:
+            conn, addr = s.accept()
+            
+            with conn:
+
+                #se selecciona el tipo a recibir
+                data = conn.recv(1024)
+                message_type, *rest = data.decode('utf-8').split('\n')
+
+                if message_type == 'TEXT':
+                        message = '\n'.join(rest)
+                        self.text_area.insert(tk.END, f"[{addr[0]}] {message}\n")
+
+                elif message_type == 'FILE':
+                        file_name = rest[0]
+                        print(file_name)
+                        with open(file_name, 'wb') as file:
+                            while True:
+                                data = conn.recv(1024)
+                                if not data:
+                                    break
+                                file.write(data)
+                                file.write(conn.recv(1024))
+                        self.text_area.insert(tk.END, f"[{addr[0]}] Received file: {file_name}\n")
+                        break
