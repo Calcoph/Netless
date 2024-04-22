@@ -130,8 +130,8 @@ class Cabecera:
         return Cabecera(data, type, message_size)
 
     def to_bytes(self) -> bytes:
-        type = self.type.to_bytes(1)
-        message_size = self.message_size.to_bytes(4)
+        type = self.type.to_bytes(1, "little")
+        message_size = self.message_size.to_bytes(4, "little")
 
         return type + message_size
 
@@ -154,8 +154,8 @@ class Identificacion:
         return Identificacion(data, alias, id)
     
     def to_bytes(self) -> bytes:
-        tamaño_alias = len(self.alias).to_bytes(2)
-        tamaño_id = len(self.id).to_bytes(2)
+        tamaño_alias = len(self.alias).to_bytes(2, "little")
+        tamaño_id = len(self.id).to_bytes(2, "little")
         alias = self.alias.encode("utf-8")
         id = self.id.encode("utf-8")
 
