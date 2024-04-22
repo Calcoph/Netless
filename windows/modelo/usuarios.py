@@ -1,8 +1,10 @@
 from __future__ import annotations
+
 from .database import DbHelper
 from .database.contracts import FicheroContract, EnviableContract, MensajeContract, UsuarioContract, ChatContract, EnviablesChatContract
 from .enviables import Enviable, Fichero, Mensaje, Dirección
 from ..comunicacion import Identificacion
+import time
 
 class HistorialChat:
     def __init__(self) -> None:
@@ -79,6 +81,8 @@ class HistorialChat:
         for enviable in self.lista_enviables:
             enviable.mostrar_en_pantalla()
 
+TIEMPO_DESCONEXION = 300.0 # 5 minutos
+
 class ListaUsuarios:
     LISTA: ListaUsuarios = None
     def __init__(self) -> None:
@@ -119,8 +123,62 @@ class ListaUsuarios:
         if usuario_registrado is None:
             usuario = Usuario(alias, ip, id)
             self.usuarios.append(usuario)
+            usuario_registrado = usuario
+
+        usuario_registrado.ultima_vez_visto = time.time()
+        usuario_registrado.estado.set_disponible(True)
+    
+    def usuarios_disponibles(self) -> list[Usuario]:
+        usuarios_disponibles = []
+        tiempo_actual = time.time()
+
+        for usuario in self.usuarios:
+            if usuario.estado.get_disponible():
+                dt = tiempo_actual - usuario.ultima_vez_visto
+                if dt < TIEMPO_DESCONEXION:
+                    usuarios_disponibles.append(usuario)
+                else:
+                    usuario.estado.set_disponible(False)
+
+        return usuarios_disponibles
+
+class Flags:
+    pass
+
+class Estado(Flags):
+    DISPONIBLE            = 0b00000001
+    EN_WHITELIST          = 0b00000010
+    SOLICITANDO_WHITELIST = 0b00000100
+
+    def __init__(self) -> None:
+        self.estado = 0
+    
+    def get_disponible(self) -> bool:
+        return self.estado & Estado.DISPONIBLE > 0
+
+    def set_disponible(self, disponible: bool):
+        if disponible:
+            self.estado = self.estado | Estado.DISPONIBLE
         else:
-            pass
+            self.estado = self.estado & (~Estado.DISPONIBLE)
+    
+    def get_en_whitelist(self) -> bool:
+        return self.estado & Estado.EN_WHITELIST > 0
+
+    def set_en_whitelist(self, en: bool) -> bool:
+        if en:
+            self.estado = self.estado | Estado.EN_WHITELIST
+        else:
+            self.estado = self.estado & (~Estado.EN_WHITELIST)
+
+    def get_solicitando_whitelist(self) -> bool:
+        return self.estado & Estado.SOLICITANDO_WHITELIST > 0
+
+    def set_solicitando_whitelist(self, sol: bool) -> bool:
+        if bool:
+            self.estado = self.estado | Estado.SOLICITANDO_WHITELIST
+        else:
+            self.estado = self.estado & (~Estado.SOLICITANDO_WHITELIST)
 
 class Usuario:
     def __init__(self, nombre: str, ip: str, id: str) -> None:
@@ -128,6 +186,8 @@ class Usuario:
         self.ip = ip
         self.chat = HistorialChat()
         self.id = id
+        self.estado = Estado()
+        self.ultima_vez_visto = 0.0
     
     def obtener_confirmacion(nombre: str, tamaño: int):
         pass

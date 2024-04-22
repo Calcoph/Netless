@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 import tkinter as tk
 from tkinter import scrolledtext, filedialog
 import socket
@@ -269,10 +270,7 @@ class GUIPrincipal(GenericGUI):
 
         self.usuarios = GenericGUI(self, row=3)
         self.usuarios.show()
-        usuarios = ListaUsuarios.get_lista()
-        for (row, usuario) in enumerate(usuarios.usuarios):
-            usuario_button = tk.Button(self.usuarios, text=usuario.ip, command=lambda x=usuario.id: self.parent.abrir_chat(x))
-            usuario_button.grid(row=row, column=0, padx=5, pady=5)
+        self.actualizar_usuarios_disponibles()
 
     def scan_lan(self):
         Comunicacion.get_com().discover()
@@ -284,7 +282,7 @@ class GUIPrincipal(GenericGUI):
         self.usuarios = self.usuarios.destroy_children()
 
         usuarios = ListaUsuarios.get_lista()
-        for (row, usuario) in enumerate(usuarios.usuarios):
+        for (row, usuario) in enumerate(usuarios.usuarios_disponibles()):
             usuario_button = tk.Button(self.usuarios, text=usuario.ip, command=lambda x=usuario.id: self.parent.abrir_chat(x))
             usuario_button.grid(row=row, column=0, padx=5, pady=5)
 
@@ -307,7 +305,8 @@ class MessageSenderApp(tk.Frame):
         comunicaciones = threading.Thread(target=self.leer_comunicaciones, daemon=True)
         comunicaciones.start()
 
-        Comunicacion.get_com().discover()
+        autoscan = threading.Thread(target=self.auto_scan, daemon=True)
+        autoscan.start()
 
     def abrir_chat(self, id_usuario: str):
         usuarios = ListaUsuarios.get_lista()
@@ -344,6 +343,12 @@ class MessageSenderApp(tk.Frame):
                 self.gui_principal.actualizar_usuarios_disponibles()
             elif tipo == TipoMensaje.PEDIR_IDENTIFICACION:
                 comunicaciones.identificarse(direccion)
+    
+    def auto_scan(self):
+        Comunicacion.get_com().discover()
+        while True:
+            time.sleep(150) # 2.5 minutos
+            Comunicacion.get_com().discover()
 
 def iniciar():
     root = tk.Tk()
