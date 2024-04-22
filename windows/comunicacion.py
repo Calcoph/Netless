@@ -266,12 +266,18 @@ class Comunicacion:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((destination_ip, 12345))
             #se crea la cabecera y el mensaje
-            cabecera = Cabecera()
-            envio_cabecera = cabecera.to_bytes()
+
+
+            #Se crea la cabecera genérica
+            
+            cabecera_generica = Cabecera()
+            cabecera_generica.type = TipoMensaje.TEXTO
+            cabecera_generica_enviar = cabecera_generica.to_bytes()
+
             texto = Texto()
             texto.to_bytes()
             #se envía el contenido del paquete
-            s.sendall(envio_cabecera + texto)
+            s.sendall(cabecera_generica_enviar + texto)
             s.close()
             #self.text_area.insert(tk.END, f"[You] {message}\n")
         except Exception as e:
@@ -289,8 +295,13 @@ class Comunicacion:
                     file_content = file.read()
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.connect((destination_ip, 12345))  # se lee el archivo y se envía por el socket
+                
 
-                #se crea la cabecera
+                #se envía la cabecera genérica
+                cabecera_generica = Cabecera()
+                cabecera_generica.type = TipoMensaje.FICHERO
+                cabecera_generica_enviar = cabecera_generica.to_bytes()
+                #se crea la cabecera del fichero
                 cabecera = CabeceraFichero()
                 cabecera.metadata = file_path
                 envio_cabecera = cabecera.to_bytes()
@@ -315,10 +326,10 @@ class Comunicacion:
                 #se selecciona el tipo a recibir
                 data = conn.recv(1024)
                 message_type, *rest = data.decode('utf-8').split('\n')
-
+                """""
                 if message_type == 'TEXT':
-                        #message = '\n'.join(rest)
-                        #self.text_area.insert(tk.END, f"[{addr[0]}] {message}\n")
+                        message = '\n'.join(rest)
+                        self.text_area.insert(tk.END, f"[{addr[0]}] {message}\n")
 
                 elif message_type == 'FILE':
                         file_name = rest[0]
@@ -332,6 +343,7 @@ class Comunicacion:
                                 file.write(conn.recv(1024))
                         self.text_area.insert(tk.END, f"[{addr[0]}] Received file: {file_name}\n")
                         break
+                """""
 
     def discover(self):
         ip_range = get_ip_range()
