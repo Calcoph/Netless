@@ -88,8 +88,7 @@ class Fichero:
         #no hace falta codificar ya que los datos serán enviados como bytes
         #datos = self.mensaje.encode("utf-8")
         return self.mensaje
-
-
+    
 class CabeceraFichero:
     TAMAÑO_MINIMO: int = 4
     def __init__(self, data: bytes | None, metadata: str) -> None:
@@ -311,7 +310,6 @@ class Comunicacion:
 
         while True:
             conn, addr = s.accept()
-            
             with conn:
 
                 #se selecciona el tipo a recibir
@@ -319,8 +317,8 @@ class Comunicacion:
                 message_type, *rest = data.decode('utf-8').split('\n')
 
                 if message_type == 'TEXT':
-                        message = '\n'.join(rest)
-                        self.text_area.insert(tk.END, f"[{addr[0]}] {message}\n")
+                        #message = '\n'.join(rest)
+                        #self.text_area.insert(tk.END, f"[{addr[0]}] {message}\n")
 
                 elif message_type == 'FILE':
                         file_name = rest[0]
