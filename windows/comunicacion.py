@@ -71,20 +71,25 @@ class Texto:
         cursor += tamaño_mensaje
 
         return Texto(data, mensaje)
+    
+    def to_bytes(self, data: bytes| None, mensaje: str) -> bytes:
+        self.mensaje.encode("utf-8")
+        return mensaje
 
 class Fichero:
-    def __init__(self, data: bytes | None, mensaje: str, contenido) -> None:
-        self.nombre = str
-        self.mensaje
+    def __init__(self, data: bytes | None, mensaje: bytes) -> None:
+        self.mensaje = mensaje
 
     def from_bytes(data: bytes) -> Fichero:
-        cursor = 0
-        tamaño_mensaje = data[cursor:cursor+2] # 2 bytes: tamaño del mensaje
-        cursor += 2
-        mensaje = data[cursor:cursor+tamaño_mensaje].decode("utf-8")
-        cursor += tamaño_mensaje
-
+        mensaje = data.decode("utf-8")
         return Fichero(data, mensaje)
+    
+    def to_bytes(self) -> bytes:
+        #no hace falta codificar ya que los datos serán enviados como bytes
+        #datos = self.mensaje.encode("utf-8")
+        return self.mensaje
+
+
 class CabeceraFichero:
     TAMAÑO_MINIMO: int = 4
     def __init__(self, data: bytes | None, metadata: str) -> None:
@@ -195,13 +200,14 @@ class Comunicacion:
             #s.sendall(f"TEXT\n{message}".encode('utf-8'))
 
 
-            #se crea la cabecera
+            #se crea la cabecera y el mensaje
             cabecera = Cabecera()
             cabecera.to_bytes()
-            
+            texto = Texto()
+            texto.to_bytes()
+
             #se envía el contenido del paquete
-            s.sendall(cabecera)
-            
+            s.sendall(cabecera + texto)
             s.close()
             
             #self.text_area.insert(tk.END, f"[You] {message}\n")
