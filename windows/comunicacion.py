@@ -183,13 +183,82 @@ class PedirIdentificacion:
         return Cabecera(None, TipoMensaje.PEDIR_IDENTIFICACION, 0).to_bytes()
 
 
-class Comunicacion:
+class ComunicacionListener:
+    def __init__(self, rx: Queue, tx: Queue) -> None:
+        self.rx = rx
+        self.tx = tx
+        th = threading.Thread(target=self.listen, daemon=True)
+        th.start()
+    
+    def listen(self):
+        handlers = {
+            TipoMensaje.PEDIR_IDENTIFICACION: self.handle_pedir_identificacion,
+            TipoMensaje.IDENTIFICACION: self.handle_identificacion,
+            TipoMensaje.TEXTO: self.handle_texto,
+            TipoMensaje.SOLICITAR_PERMISO_ARCHIVO: self.handle_solicitar_permiso_archivo,
+            TipoMensaje.RESPUESTA_PERMISO_ARCHIVO: self.handle_respuesta_permiso_archivo,
+            TipoMensaje.CONTINUACION_FICHERO: self.handle_continuacion_fichero,
+            TipoMensaje.FICHERO: self.handle_fichero,
+        }
+        listener_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        listener_socket.bind(("0.0.0.0", 12345))
+        listener_socket.listen(50)
+        listener_socket.setblocking(False)
+        listener_socket.settimeout(3.0) # Cada 3 segundos mirará la cola´
 
+        while True:
+            while not self.rx.empty():
+                message = self.rx.get()
+            try:
+                (con, addr) = listener_socket.accept()
+                cabecera: Cabecera = Cabecera.read_from_socket(con)
+                handlers[cabecera.type](cabecera, con, addr)
+            except TimeoutError:
+                # Es para que de vez en cuando mire self.rx
+                pass
+    
+    def handle_identificacion(self, cabecera: Cabecera, con: socket.socket, addr):
+        if cabecera.message_size == 0:
+            # Un mensaje de tipo identificación tiene que tener cuerpo
+            return
+        cuerpo = con.recv(cabecera.message_size)
+        identificacion = Identificacion.from_bytes(cuerpo)
+        print(f"Se ha enviado ident a {addr}")
+        self.tx.put(((TipoMensaje.IDENTIFICACION, addr), identificacion))
+
+    def handle_texto(self, cabecera: Cabecera, con: socket.socket, addr):
+        raise NotImplementedError
+    
+    def handle_pedir_identificacion(self, cabecera: Cabecera, con: socket.socket, addr):
+        print(f"Se ha pedido ident desde {addr}")
+        self.tx.put(((TipoMensaje.PEDIR_IDENTIFICACION, addr), None))
+    
+    def handle_solicitar_permiso_archivo(self, cabecera: Cabecera, con: socket.socket, addr):
+        raise NotImplementedError
+    
+    def handle_respuesta_permiso_archivo(self, cabecera: Cabecera, con: socket.socket, addr):
+        raise NotImplementedError
+    
+    def handle_fichero(self, cabecera: Cabecera, con: socket.socket, addr):
+        raise NotImplementedError
+
+class Comunicacion:
+    COMM: Comunicacion = None
     def __init__(self) -> None:
-        pass
+        if Comunicacion.COMM is None:
+            Comunicacion.COMM = self
+            self.rx = Queue()
+            self.tx = Queue()
+        else:
+            raise SystemError
+
+    def get_com():
+        if Comunicacion.COMM is None:
+            Comunicacion()
+
+        return Comunicacion.COMM
 
     def enviar_mensaje(self, usuario, chat, mensaje: str):
-        
         destination_ip = usuario.ip
         message = chat.entry_message.get()
         
@@ -266,81 +335,39 @@ class Comunicacion:
                         self.text_area.insert(tk.END, f"[{addr[0]}] Received file: {file_name}\n")
                         break
 
-def discover() -> list[Identificacion]:
-    ip_range = get_ip_range()
-    devices = scan_lan(ip_range)
-    print("Dispositivos en la LAN:")
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind(("0.0.0.0", 12345))
-    sock.listen(len(devices))
-    send_threads: list[threading.Thread] = []
-    stdout_lock = threading.Lock()
-    for device in devices:
-        print(f"IP: {device.ip}, MAC: {device.mac}")
-        th = threading.Thread(target=lambda : pedir_identificacion(device, stdout_lock))
-        th.start()
-        send_threads.append(th)
-    for th in send_threads:
-        th.join(5.0)
-    print("joined all")
-    q = Queue()
-    identificaciones = []
-    th = threading.Thread(target=lambda : response_listener(sock, q, identificaciones))
-    th.start()
+    def discover(self):
+        ip_range = get_ip_range()
+        devices = scan_lan(ip_range)
+        print("Dispositivos en la LAN:")
+        stdout_lock = threading.Lock()
+        for device in devices:
+            print(f"IP: {device.ip}, MAC: {device.mac}")
+            th = threading.Thread(target=lambda : Comunicacion.pedir_identificacion(device, stdout_lock), daemon=True)
+            th.start()
 
-    time.sleep(5)
-    q.put(True)
-    th.join(5.0)
-    if th.is_alive():
-        print("Didn't end")
-    th.join()
-
-    return identificaciones
-
-def pedir_identificacion(device: Direccion, stdout_lock: threading.Lock):
-    send_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    send_sock.settimeout(3.0)
-    try:
-        send_sock.connect((device.ip, 12345))
-        send_sock.sendall(PedirIdentificacion().bytes_con_cabecera())
-    except ConnectionRefusedError:
-        stdout_lock.acquire(timeout=1.0)
-        print(f"{device.ip}: Ese dispositivo no acepta el protocolo")
-        stdout_lock.release()
-    except TimeoutError:
-        stdout_lock.acquire(timeout=1.0)
-        print(f"{device.ip}: Timeout")
-        stdout_lock.release()
-
-def response_listener(sock: socket.socket, q: Queue, identificaciones: list[Identificacion]):
-    sock.setblocking(False)
-    sock.settimeout(3.0)
-    while q.empty():
+    def pedir_identificacion(device: Direccion, stdout_lock: threading.Lock):
+        send_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        send_sock.settimeout(3.0)
         try:
-            (con, addr) = sock.accept()
-            cabecera: Cabecera = Cabecera.read_from_socket(con)
-            print(cabecera.message_size)
-            if cabecera.type == TipoMensaje.IDENTIFICACION:
-                if cabecera.message_size == 0:
-                    # Un mensaje de tipo identificación tiene que tener cuerpo
-                    continue
-                cuerpo = con.recv(cabecera.message_size)
-                identificacion = Identificacion.from_bytes(cuerpo)
-                identificaciones.append(identificacion)
+            send_sock.connect((device.ip, 12345))
+            send_sock.sendall(PedirIdentificacion().bytes_con_cabecera())
+        except ConnectionRefusedError:
+            stdout_lock.acquire(timeout=1.0)
+            print(f"{device.ip}: Ese dispositivo no acepta el protocolo")
+            stdout_lock.release()
         except TimeoutError:
-            # Es para que de vez en cuando mire q.empty()
-            pass
+            stdout_lock.acquire(timeout=1.0)
+            print(f"{device.ip}: Timeout")
+            stdout_lock.release()
 
-    return identificaciones
+    def identificarse(ip: str):
+        """Respuesta a un mensaje PedirIdenificacion"""
+        opciones = OpcionesUsuario.get_opciones()
+        alias = opciones.get_alias()
+        id = opciones.get_display_id()
+        mensaje = Identificacion(None, alias, id)
 
-def responder_identificacion(ip: str):
-    """Asumimos que hemos recibido un mensaje PedirIdenificacion"""
-    opciones = OpcionesUsuario.get_opciones()
-    alias = opciones.get_alias()
-    id = opciones.get_display_id()
-    mensaje = Identificacion(None, alias, id)
-
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect((ip, 12345))
-    sock.sendall(mensaje.bytes_con_cabecera())
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((ip, 12345))
+        sock.sendall(mensaje.bytes_con_cabecera())
 

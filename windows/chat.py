@@ -5,8 +5,9 @@ from tkinter import scrolledtext, filedialog
 import socket
 import threading
 
-from windows.modelo.enviables import Fichero, Dirección
-from windows.modelo.whitelist import Whitelist
+from .comunicacion import Comunicacion, TipoMensaje
+from .modelo.enviables import Fichero, Dirección
+from .modelo.whitelist import Whitelist
 from .modelo.usuarios import Usuario, ListaUsuarios
 from .modelo.configuración import OpcionesUsuario
 
@@ -274,16 +275,18 @@ class GUIPrincipal(GenericGUI):
             usuario_button.grid(row=row, column=0, padx=5, pady=5)
 
     def scan_lan(self):
-        self.usuarios = self.usuarios.destroy_children()
-
-        usuarios = ListaUsuarios.get_lista()
-        usuarios.scan_lan()
-        for (row, usuario) in enumerate(usuarios.usuarios):
-            usuario_button = tk.Button(self.usuarios, text=usuario.ip, command=lambda x=usuario.id: self.parent.abrir_chat(x))
-            usuario_button.grid(row=row, column=0, padx=5, pady=5)
+        Comunicacion.get_com().discover()
 
     def aceptar_usuario(self, id_usuario: str):
         Whitelist.añadir_usuario(id_usuario)
+    
+    def actualizar_usuarios_disponibles(self):
+        self.usuarios = self.usuarios.destroy_children()
+
+        usuarios = ListaUsuarios.get_lista()
+        for (row, usuario) in enumerate(usuarios.usuarios):
+            usuario_button = tk.Button(self.usuarios, text=usuario.ip, command=lambda x=usuario.id: self.parent.abrir_chat(x))
+            usuario_button.grid(row=row, column=0, padx=5, pady=5)
 
 class MessageSenderApp(tk.Frame):
     def __init__(self, root):
@@ -294,11 +297,17 @@ class MessageSenderApp(tk.Frame):
 
         self.back_button = tk.Button(self, text="Volver a lista de usuarios", command=self.volver_a_gui_principal)
         self.vista_seleccionada = Vistas.USUARIOS
+
         self.gui_principal = GUIPrincipal(self)
         self.gui_principal.show()
 
         self.gui_chat = GUIChat(self)
         self.gui_opciones = GUIOpciones(self)
+
+        comunicaciones = threading.Thread(target=self.leer_comunicaciones, daemon=True)
+        comunicaciones.start()
+
+        Comunicacion.get_com().discover()
 
     def abrir_chat(self, id_usuario: str):
         usuarios = ListaUsuarios.get_lista()
@@ -322,8 +331,19 @@ class MessageSenderApp(tk.Frame):
 
         self.back_button.grid(row=1, column=0, padx=5, pady=5)
         self.gui_opciones.show()
-    
-    
+
+    def leer_comunicaciones(self):
+        comunicaciones = Comunicacion.get_com()
+        usuarios = ListaUsuarios.get_lista()
+
+        while True:
+            (tipo, direccion), mensaje = comunicaciones.rx.get()
+
+            if tipo == TipoMensaje.IDENTIFICACION:
+                usuarios.identificar(mensaje, direccion)
+                self.gui_principal.actualizar_usuarios_disponibles()
+            elif tipo == TipoMensaje.PEDIR_IDENTIFICACION:
+                comunicaciones.identificarse(direccion)
 
 def iniciar():
     root = tk.Tk()
