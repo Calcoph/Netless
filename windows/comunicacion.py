@@ -197,19 +197,14 @@ class Comunicacion:
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((destination_ip, 12345))
-            #s.sendall(f"TEXT\n{message}".encode('utf-8'))
-
-
             #se crea la cabecera y el mensaje
             cabecera = Cabecera()
-            cabecera.to_bytes()
+            envio_cabecera = cabecera.to_bytes()
             texto = Texto()
             texto.to_bytes()
-
             #se envía el contenido del paquete
-            s.sendall(cabecera + texto)
+            s.sendall(envio_cabecera + texto)
             s.close()
-            
             #self.text_area.insert(tk.END, f"[You] {message}\n")
         except Exception as e:
             print(f"An error occurred while sending message: {str(e)}")
@@ -218,7 +213,6 @@ class Comunicacion:
         destination_ip = self.usuario.ip
         #a diferencia de send_message el archivo se obtiene de una ventana emergente
         
-
         #guichat llama esta función para enviar mensaje/archivo
         #file_path = filedialog.askopenfilename()
         if file_path:
@@ -227,10 +221,17 @@ class Comunicacion:
                     file_content = file.read()
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.connect((destination_ip, 12345))  # se lee el archivo y se envía por el socket
-                s.sendall(f"FILE\n{file_path.split('/')[-1]}".encode('utf-8'))
-                s.sendall(file_content)
+
+                #se crea la cabecera
+                cabecera = CabeceraFichero()
+                cabecera.metadata = file_path
+                envio_cabecera = cabecera.to_bytes()
+                contenido = Fichero()
+                contenido.mensaje = file_content
+                contenido_enviar = contenido.to_bytes()
+                s.sendall(envio_cabecera + contenido_enviar)
                 s.close()
-                self.text_area.insert(tk.END, f"[You] Sent file: {file_path}\n")
+                #self.text_area.insert(tk.END, f"[You] Sent file: {file_path}\n")
             except Exception as e:
                 print(f"An error occurred while sending file: {str(e)}")
     
