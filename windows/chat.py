@@ -194,7 +194,7 @@ class GUIChat(GenericGUI):
                 print(f"An error occurred while sending file: {str(e)}")
     
     def receive_messages(self,):
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        """s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind(('0.0.0.0', 12345)) 
         s.listen(1)
 
@@ -223,7 +223,7 @@ class GUIChat(GenericGUI):
                                 file.write(conn.recv(1024))
                         self.text_area.insert(tk.END, f"[{addr[0]}] Received file: {file_name}\n")
                         break
-
+"""
 
 
         """"
@@ -343,12 +343,14 @@ class MessageSenderApp(tk.Frame):
 
         while True:
             (tipo, direccion), mensaje = comunicaciones.rx.get()
+            print(type(direccion))
+            print(f"recibido {direccion}")
 
             if tipo == TipoMensaje.IDENTIFICACION:
                 usuarios.identificar(mensaje, direccion)
                 self.gui_principal.actualizar_usuarios_disponibles()
             elif tipo == TipoMensaje.PEDIR_IDENTIFICACION:
-                comunicaciones.identificarse(direccion)
+                Comunicacion.identificarse(direccion)
             elif tipo == TipoMensaje.SOLICITAR_CONEXION:
                 print("Se ha solicitado una conexión")
                 usuario = usuarios.usuario_ip(direccion)
