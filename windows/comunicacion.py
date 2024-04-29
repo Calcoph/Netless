@@ -222,11 +222,25 @@ class ComunicacionListener:
         listener_socket.setblocking(False)
         listener_socket.settimeout(3.0) # Cada 3 segundos mirará la cola´
 
+        udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        udp_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        udp_sock.bind("0.0.0.0", 12346)
+        udp_sock.listen(50)
+        udp_sock.setblocking(False)
+        udp_sock.settimeout(3.0)
+
         while True:
             while not self.rx.empty():
                 message = self.rx.get()
             try:
                 (con, addr) = listener_socket.accept()
+                cabecera: Cabecera = Cabecera.read_from_socket(con)
+                handlers[cabecera.type](cabecera, con, addr)
+            except TimeoutError:
+                # Es para que de vez en cuando mire self.rx
+                pass
+            try:
+                (con, addr) = udp_sock.accept()
                 cabecera: Cabecera = Cabecera.read_from_socket(con)
                 handlers[cabecera.type](cabecera, con, addr)
             except TimeoutError:
@@ -366,28 +380,25 @@ class Comunicacion:
                 """""
 
     def discover(self):
-        ip_range = get_ip_range()
-        devices = scan_lan(ip_range)
-        print("Dispositivos en la LAN:")
+        print("Iniciando discover")
         stdout_lock = threading.Lock()
-        for device in devices:
-            print(f"IP: {device.ip}, MAC: {device.mac}")
-            th = threading.Thread(target=lambda : Comunicacion.pedir_identificacion(device, stdout_lock), daemon=True)
-            th.start()
+        th = threading.Thread(target=lambda : Comunicacion.pedir_identificacion(stdout_lock), daemon=True)
+        th.start()
 
-    def pedir_identificacion(device: Direccion, stdout_lock: threading.Lock):
-        send_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    def pedir_identificacion(stdout_lock: threading.Lock):
+        send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        send_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         send_sock.settimeout(3.0)
+        ip = "255.255.255.255"
         try:
-            send_sock.connect((device.ip, 12345))
-            send_sock.sendall(PedirIdentificacion().bytes_con_cabecera())
+            send_sock.sendto(PedirIdentificacion().bytes_con_cabecera(), (ip, 12346))
         except ConnectionRefusedError:
             stdout_lock.acquire(timeout=1.0)
-            print(f"{device.ip}: Ese dispositivo no acepta el protocolo")
+            print(f"{ip}: Ese dispositivo no acepta el protocolo")
             stdout_lock.release()
         except TimeoutError:
             stdout_lock.acquire(timeout=1.0)
-            print(f"{device.ip}: Timeout")
+            print(f"{ip}: Timeout")
             stdout_lock.release()
 
     def identificarse(ip: str):

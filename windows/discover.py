@@ -16,7 +16,7 @@ def scan_lan(ip_range) -> list[Direccion]:
     packet = ether / arp_request
 
     # Envía y recibe paquetes
-    result = srp(packet, timeout=3, verbose=False)[0]
+    result = srp(packet, timeout=30, verbose=False)[0]
 
     # Lista para almacenar direcciones MAC e IPs
     devices = []
@@ -32,7 +32,7 @@ def scan_lan(ip_range) -> list[Direccion]:
 def get_ip_range() -> str:
     ip = get_if_addr(conf.iface)  # default interface
     print(ip)
-    ip = ip + "/24"
+    ip = ip + "/16"
     return ip
 
 #se obtiene la IP del equipo y se busca en el /24 de esa dirección
