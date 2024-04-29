@@ -142,6 +142,15 @@ class ListaUsuarios:
 
         return usuarios_disponibles
 
+    def usuario_ip(self, direccion) -> Usuario | None:
+        usuario_ret = None
+        for usuario in self.usuarios:
+            if usuario.ip == direccion:
+                usuario_ret = usuario
+                break
+
+        return usuario_ret
+
 class Flags:
     pass
 
@@ -149,6 +158,7 @@ class Estado(Flags):
     DISPONIBLE            = 0b00000001
     EN_WHITELIST          = 0b00000010
     SOLICITANDO_WHITELIST = 0b00000100
+    ACEPTA_CONEXIONES     = 0b00001000
 
     def __init__(self) -> None:
         self.estado = 0
@@ -175,10 +185,19 @@ class Estado(Flags):
         return self.estado & Estado.SOLICITANDO_WHITELIST > 0
 
     def set_solicitando_whitelist(self, sol: bool) -> bool:
-        if bool:
+        if sol:
             self.estado = self.estado | Estado.SOLICITANDO_WHITELIST
         else:
             self.estado = self.estado & (~Estado.SOLICITANDO_WHITELIST)
+
+    def get_acepta_conexiones(self) -> bool:
+        return self.estado & Estado.acepta_conexiones > 0
+
+    def set_acepta_conexiones(self, acepta: bool) -> bool:
+        if acepta:
+            self.estado = self.estado | Estado.ACEPTA_CONEXIONES
+        else:
+            self.estado = self.estado & (~Estado.ACEPTA_CONEXIONES)
 
 class Usuario:
     def __init__(self, nombre: str, ip: str, id: str) -> None:
@@ -212,9 +231,7 @@ class Usuario:
         return self.id
     
     def acepta_conexiones(self) -> bool:
-        print("ERROR: acepta_conexiones no está implementado y devuelve siempre True")
-        return True
+        return self.estado.get_acepta_conexiones()
     
-    def solicitar_conexion(self) -> bool:
-        print("ERROR: solicitar_conexion no está implementado y devuelve siempre True")
-        return True
+    def solicitar_conexion(self):
+        print("ERROR: solicitar_conexion no está implementado")

@@ -123,9 +123,7 @@ class GUIChat(GenericGUI):
             self.activar_envio()
         else:
             self.desactivar_envio()
-            acepta_conexiones = self.usuario.solicitar_conexion()
-            if acepta_conexiones:
-                self.activar_envio()
+            self.usuario.solicitar_conexion()
         self.label2.grid_forget()
         self.label2 = tk.Label(self, text=f"chateando con {usuario.nombre}")
         self.label2.grid(row=1, column=0, padx=5, pady=5)
@@ -284,7 +282,15 @@ class GUIPrincipal(GenericGUI):
         usuarios = ListaUsuarios.get_lista()
         for (row, usuario) in enumerate(usuarios.usuarios_disponibles()):
             usuario_button = tk.Button(self.usuarios, text=usuario.ip, command=lambda x=usuario.id: self.parent.abrir_chat(x))
+            usuario_button.id_usuario = usuario.id
             usuario_button.grid(row=row, column=0, padx=5, pady=5)
+
+            if usuario.estado.get_solicitando_whitelist():
+                solicitando_whitelist_text = tk.Label(self.usuarios, text="Solicitando conexión")
+                solicitando_whitelist_text.grid(row=row, column=1, padx=5, pady=5)
+
+    def conexion_solicitada(self, id_usuario: str):
+        self.actualizar_usuarios_disponibles()
 
 class MessageSenderApp(tk.Frame):
     def __init__(self, root):
@@ -343,6 +349,12 @@ class MessageSenderApp(tk.Frame):
                 self.gui_principal.actualizar_usuarios_disponibles()
             elif tipo == TipoMensaje.PEDIR_IDENTIFICACION:
                 comunicaciones.identificarse(direccion)
+            elif tipo == TipoMensaje.SOLICITAR_CONEXION:
+                print("Se ha solicitado una conexión")
+                usuario = usuarios.usuario_ip(direccion)
+                usuario.estado.set_solicitando_whitelist(True)
+                id_usuario = usuario.id
+                self.gui_principal.conexion_solicitada(id_usuario)
     
     def auto_scan(self):
         Comunicacion.get_com().discover()

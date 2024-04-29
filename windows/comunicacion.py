@@ -20,6 +20,7 @@ class TipoMensaje(Enum):
     PEDIR_IDENTIFICACION = 0x04
     SOLICITAR_PERMISO_ARCHIVO = 0x05
     RESPUESTA_PERMISO_ARCHIVO = 0x06
+    SOLICITAR_CONEXION = 0x07
 
 class SolicitarPermisoArchivo:
     def __init__(self) -> None:
@@ -180,6 +181,21 @@ class PedirIdentificacion:
     
     def bytes_con_cabecera(self) -> bytes:
         return Cabecera(None, TipoMensaje.PEDIR_IDENTIFICACION, 0).to_bytes()
+    
+class SolicitarConexion:
+    def __init__(self) -> None:
+        pass
+
+    def from_bytes(data: bytes) -> SolicitarConexion:
+        if len(data) > 0:
+            raise Exception("SolicitarConexion es un mensaje de tamaño 0")
+        return PedirIdentificacion()
+
+    def to_bytes(self) -> bytes:
+        return bytes()
+    
+    def bytes_con_cabecera(self) -> bytes:
+        return Cabecera(None, TipoMensaje.SolicitarConexion, 0).to_bytes()
 
 
 class ComunicacionListener:
@@ -198,6 +214,7 @@ class ComunicacionListener:
             TipoMensaje.RESPUESTA_PERMISO_ARCHIVO: self.handle_respuesta_permiso_archivo,
             TipoMensaje.CONTINUACION_FICHERO: self.handle_continuacion_fichero,
             TipoMensaje.FICHERO: self.handle_fichero,
+            TipoMensaje.SOLICITAR_CONEXION: self.handle_solicitar_conexion,
         }
         listener_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         listener_socket.bind(("0.0.0.0", 12345))
@@ -240,6 +257,9 @@ class ComunicacionListener:
     
     def handle_fichero(self, cabecera: Cabecera, con: socket.socket, addr):
         raise NotImplementedError
+    
+    def handle_solicitar_conexion(self, cabecera: Cabecera, con: socket.socket, addr):
+        self.tx.put(((TipoMensaje.SOLICITAR_CONEXION, addr), None))
 
 class Comunicacion:
     COMM: Comunicacion = None
