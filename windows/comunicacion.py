@@ -137,14 +137,14 @@ class Cabecera:
 
 class Identificacion:
     def __init__(self, data: bytes | None, alias: str, id: str) -> None:
-        self.alias = str
-        self.id = str
+        self.alias = alias
+        self.id = id
 
     def from_bytes(data: bytes) -> Identificacion:
         cursor = 0
-        tamaño_alias = data[cursor:cursor+2] # 2 bytes: tamaño del alias
+        tamaño_alias = int.from_bytes(data[cursor:cursor+2], "little") # 2 bytes: tamaño del alias
         cursor += 2
-        tamaño_id = data[cursor:cursor+2] # 2 bytes: tamaño del id
+        tamaño_id = int.from_bytes(data[cursor:cursor+2], "little") # 2 bytes: tamaño del id
         cursor += 2
         alias = data[cursor:cursor+tamaño_alias].decode("utf-8")
         cursor += tamaño_alias
@@ -227,8 +227,9 @@ class ComunicacionListener:
                 message = self.rx.get()
             try:
                 (con, addr) = listener_socket.accept()
+                print(f"Aceptado mensaje de {addr[0]}")
                 cabecera: Cabecera = Cabecera.read_from_socket(con)
-                handlers[cabecera.type](cabecera, con, addr)
+                handlers[cabecera.type](cabecera, con, addr[0])
             except TimeoutError:
                 # Es para que de vez en cuando mire self.rx
                 pass
@@ -255,6 +256,9 @@ class ComunicacionListener:
     def handle_respuesta_permiso_archivo(self, cabecera: Cabecera, con: socket.socket, addr):
         raise NotImplementedError
     
+    def handle_continuacion_fichero(self, cabecera: Cabecera, con: socket.socket, addr):
+        raise NotImplementedError
+    
     def handle_fichero(self, cabecera: Cabecera, con: socket.socket, addr):
         raise NotImplementedError
     
@@ -263,11 +267,13 @@ class ComunicacionListener:
 
 class Comunicacion:
     COMM: Comunicacion = None
+    LISTENER: ComunicacionListener = None
     def __init__(self) -> None:
         if Comunicacion.COMM is None:
             Comunicacion.COMM = self
             self.rx = Queue()
             self.tx = Queue()
+            Comunicacion.LISTENER = ComunicacionListener(self.tx, self.rx)
         else:
             raise SystemError
 
@@ -382,6 +388,7 @@ class Comunicacion:
         try:
             send_sock.connect((device.ip, 12345))
             send_sock.sendall(PedirIdentificacion().bytes_con_cabecera())
+            print(f"enviado a {device.ip}")
         except ConnectionRefusedError:
             stdout_lock.acquire(timeout=1.0)
             print(f"{device.ip}: Ese dispositivo no acepta el protocolo")

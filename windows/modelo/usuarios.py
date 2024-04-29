@@ -191,7 +191,7 @@ class Estado(Flags):
             self.estado = self.estado & (~Estado.SOLICITANDO_WHITELIST)
 
     def get_acepta_conexiones(self) -> bool:
-        return self.estado & Estado.acepta_conexiones > 0
+        return self.estado & Estado.ACEPTA_CONEXIONES > 0
 
     def set_acepta_conexiones(self, acepta: bool) -> bool:
         if acepta:
