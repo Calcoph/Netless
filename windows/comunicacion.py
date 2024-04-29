@@ -285,30 +285,24 @@ class Comunicacion:
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((destination_ip, 12345))
-            #se crea la cabecera y el mensaje
-
-
             #Se crea la cabecera genérica
-            
             cabecera_generica = Cabecera()
             cabecera_generica.type = TipoMensaje.TEXTO
             cabecera_generica_enviar = cabecera_generica.to_bytes()
-
+            #Se crea la cabecera de texto
             texto = Texto()
             texto.to_bytes()
             #se envía el contenido del paquete
-            s.sendall(cabecera_generica_enviar + texto)
+            s.sendall(cabecera_generica_enviar + texto + message)
             s.close()
             #self.text_area.insert(tk.END, f"[You] {message}\n")
         except Exception as e:
             print(f"An error occurred while sending message: {str(e)}")
 
-    def send_file(self):
+    def send_file(self, usuario, chat, mensaje: str):
         destination_ip = self.usuario.ip
-        #a diferencia de send_message el archivo se obtiene de una ventana emergente
-        
         #guichat llama esta función para enviar mensaje/archivo
-        #file_path = filedialog.askopenfilename()
+        file_path = chat.filedialog.askopenfilename()
         if file_path:
             try:
                 with open(file_path, 'rb') as file:
@@ -328,7 +322,7 @@ class Comunicacion:
                 contenido = Fichero()
                 contenido.mensaje = file_content
                 contenido_enviar = contenido.to_bytes()
-                s.sendall(envio_cabecera + contenido_enviar)
+                s.sendall(cabecera_generica + envio_cabecera + contenido_enviar)
                 s.close()
                 #self.text_area.insert(tk.END, f"[You] Sent file: {file_path}\n")
             except Exception as e:
