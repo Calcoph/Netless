@@ -2,11 +2,7 @@ from __future__ import annotations
 from datetime import datetime
 
 class Enum:
-    def to_int(self) -> int:
-        raise NotImplementedError
-    
-    def from_int(i: int) -> Enum:
-        raise NotImplementedError
+    pass
 
 class Dirección(Enum):
     Entrante = 1
