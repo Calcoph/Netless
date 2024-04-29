@@ -323,7 +323,8 @@ class Comunicacion:
             conn, addr = s.accept()
             with conn:
 
-                #se selecciona el tipo a recibir
+                #se recibe la cabecera genérica
+                
                 data = conn.recv(1024)
                 message_type, *rest = data.decode('utf-8').split('\n')
                 """""
