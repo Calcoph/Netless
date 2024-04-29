@@ -124,7 +124,7 @@ class Cabecera:
         cursor = 0
         type = data[cursor] # 1 byte: tipo
         cursor += 1
-        message_size = int.from_bytes(data[cursor:cursor+4]) # 4 bytes: tamaño del cuerpo
+        message_size = int.from_bytes(data[cursor:cursor+4], "little") # 4 bytes: tamaño del cuerpo
         # Tamaño máximo de mensaje: casi 4 GiB
         cursor += 4
         return Cabecera(data, type, message_size)
@@ -220,7 +220,7 @@ class ComunicacionListener:
         listener_socket.bind(("0.0.0.0", 12345))
         listener_socket.listen(50)
         listener_socket.setblocking(False)
-        listener_socket.settimeout(3.0) # Cada 3 segundos mirará la cola´
+        listener_socket.settimeout(3.0) # Cada 3 segundos mirará la cola
 
         while True:
             while not self.rx.empty():
@@ -229,6 +229,8 @@ class ComunicacionListener:
                 (con, addr) = listener_socket.accept()
                 print(f"Aceptado mensaje de {addr[0]}")
                 cabecera: Cabecera = Cabecera.read_from_socket(con)
+                print(cabecera.type)
+                print("\n")
                 handlers[cabecera.type](cabecera, con, addr[0])
             except TimeoutError:
                 # Es para que de vez en cuando mire self.rx
@@ -244,7 +246,12 @@ class ComunicacionListener:
         self.tx.put(((TipoMensaje.IDENTIFICACION, addr), identificacion))
 
     def handle_texto(self, cabecera: Cabecera, con: socket.socket, addr):
-        raise NotImplementedError
+        ###################################################
+        cuerpo = con.recv(cabecera.message_size)
+        texto = Texto.from_abytes(cuerpo)
+        print(f"Se ha enviado ident a {addr}")
+        self.tx.put(((TipoMensaje.TEXTO, addr), texto))
+        ###################################################raise NotImplementedError
     
     def handle_pedir_identificacion(self, cabecera: Cabecera, con: socket.socket, addr):
         print(f"Se ha pedido ident desde {addr}")
@@ -295,11 +302,13 @@ class Comunicacion:
             cabecera_generica = Cabecera()
             cabecera_generica.type = TipoMensaje.TEXTO
             cabecera_generica_enviar = cabecera_generica.to_bytes()
+            print("parte del envio:\n")
+            print(cabecera_generica.type)
             #Se crea la cabecera de texto
             texto = Texto()
             texto.to_bytes()
             #se envía el contenido del paquete
-            s.sendall(cabecera_generica_enviar + texto + message)
+            s.sendall(cabecera_generica_enviar )#+ texto + message)
             s.close()
             #self.text_area.insert(tk.END, f"[You] {message}\n")
         except Exception as e:
