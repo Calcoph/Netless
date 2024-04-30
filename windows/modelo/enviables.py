@@ -15,7 +15,7 @@ class Dirección(Enum):
             self.dir = Dirección.Saliente
         else:
             raise ValueError
-        
+
 
     def to_int(self) -> int:
         return self.dir
@@ -30,12 +30,15 @@ class Enviable:
 
     def mostrar_en_pantalla(self):
         raise NotImplementedError
-    
+
     def get_fecha(self) -> datetime:
         return self.fecha
-    
+
     def get_dirección(self) -> Dirección:
         return self.dirección
+
+    def inicializar(id: str) -> Enviable:
+        raise NotImplementedError
 
 class Fichero(Enviable):
     def __init__(self, nombre: str, tamaño: int, dirección: Dirección) -> None:
@@ -43,7 +46,7 @@ class Fichero(Enviable):
         self.tamaño = tamaño
 
         super().__init__(dirección)
-    
+
     def get_nombre(self) -> str:
         return self.nombre
 

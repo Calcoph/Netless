@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .database import DbHelper
+from .database.DbHelper import DbHelper
 from .database.contracts import FicheroContract, EnviableContract, MensajeContract, UsuarioContract, ChatContract, EnviablesChatContract
 from .enviables import Enviable, Fichero, Mensaje, Dirección
 from ..comunicacion import Comunicacion, Identificacion
@@ -76,10 +76,25 @@ class HistorialChat:
             EnviablesChatContract.COLUMN_NAME_ENV_ID
         ]
         db_helper.insert(EnviablesChatContract.TABLE_NAME, (chat_id, env_id), column_names=columns)
-    
+
     def mostrar_en_pantalla(self):
         for enviable in self.lista_enviables:
             enviable.mostrar_en_pantalla()
+
+    def inicializar(id: str):
+        db = DbHelper.get()
+        columns = [
+            EnviablesChatContract.COLUMN_NAME_ENV_ID,
+        ]
+        db_enviables = db.select(
+            EnviablesChatContract.TABLE_NAME,
+            column_names=columns,
+            where=f"{EnviablesChatContract.COLUMN_NAME_CHAT_ID} = ?",
+            where_values=[id]
+        ).fetch_all()
+
+        for (env_id,) in db_enviables:
+            enviable = Enviable.inicializar(env_id)
 
 TIEMPO_DESCONEXION = 300.0 # 5 minutos
 
@@ -89,6 +104,17 @@ class ListaUsuarios:
         if ListaUsuarios.LISTA is None:
             ListaUsuarios.LISTA = self
             self.usuarios: list[Usuario] = []
+
+            db = DbHelper.get()
+            columns = [
+                UsuarioContract.COLUMN_NAME_ALIAS,
+                UsuarioContract.COLUMN_NAME_CHAT_ID,
+                UsuarioContract.COLUMN_NAME_ID
+            ]
+            db_usuarios = db.select(UsuarioContract.TABLE_NAME, column_names=columns).fetch_all()
+            for (alias, chat_id, id) in db_usuarios:
+                usuario = Usuario(alias, None, id)
+                usuario.chat.inicializar(chat_id)
         else:
             raise SystemError
 
@@ -96,7 +122,7 @@ class ListaUsuarios:
         if ListaUsuarios.LISTA is None:
             ListaUsuarios()
         return ListaUsuarios.LISTA
-    
+
     def añadir_usuario(self, usr: Usuario):
         db_helper = DbHelper.DbHelper.get()
 
@@ -118,7 +144,7 @@ class ListaUsuarios:
             db_helper.insert(UsuarioContract.TABLE_NAME, (usr.id, chat_id, usr.nombre), column_names=columns)
 
         self.usuarios.append(usr)
-    
+
     def quitar_usuario(self, id: str):
         remove_index = None
         for (index, usuario) in enumerate(self.usuarios):
@@ -127,7 +153,7 @@ class ListaUsuarios:
                 break
         if remove_index is not None:
             self.usuarios.pop(remove_index)
-    
+
     def obtener_usuario(self, id: str) -> Usuario | None:
         for usuario in self.usuarios:
             if usuario.id == id:
@@ -146,7 +172,7 @@ class ListaUsuarios:
 
         usuario_registrado.ultima_vez_visto = time.time()
         usuario_registrado.estado.set_disponible(True)
-    
+
     def usuarios_disponibles(self) -> list[Usuario]:
         usuarios_disponibles = []
         tiempo_actual = time.time()
@@ -180,7 +206,7 @@ class Estado(Flags):
 
     def __init__(self) -> None:
         self.estado = 0
-    
+
     def get_disponible(self) -> bool:
         return self.estado & Estado.DISPONIBLE > 0
 
@@ -209,14 +235,14 @@ class Estado(Flags):
             self.estado = self.estado & (~Estado.ACEPTA_CONEXIONES)
 
 class Usuario:
-    def __init__(self, nombre: str, ip: str, id: str) -> None:
+    def __init__(self, nombre: str, ip: str | None, id: str) -> None:
         self.nombre = nombre
         self.ip = ip
         self.chat = HistorialChat()
         self.id = id
         self.estado = Estado()
         self.ultima_vez_visto = 0.0
-    
+
     def obtener_confirmacion(nombre: str, tamaño: int):
         pass
 
@@ -229,18 +255,18 @@ class Usuario:
     def enviar_mensaje(self, msg: str):
         mens = Mensaje(msg, Dirección.Saliente)
         self.chat.añadir_mensaje(mens)
-    
+
     def obtener_nombre(self) -> str:
         return self.nombre
-    
+
     def obtener_chat(self) -> HistorialChat:
         return self.chat
-    
+
     def obtener_id(self) -> str:
         return self.id
-    
+
     def acepta_conexiones(self) -> bool:
         return self.estado.get_acepta_conexiones()
-    
+
     def solicitar_conexion(self):
         Comunicacion.solicitar_conexion(self.ip)
