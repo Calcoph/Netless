@@ -175,7 +175,6 @@ class Flags:
 
 class Estado(Flags):
     DISPONIBLE            = 0b00000001
-    EN_WHITELIST          = 0b00000010
     SOLICITANDO_WHITELIST = 0b00000100
     ACEPTA_CONEXIONES     = 0b00001000
 
@@ -190,15 +189,6 @@ class Estado(Flags):
             self.estado = self.estado | Estado.DISPONIBLE
         else:
             self.estado = self.estado & (~Estado.DISPONIBLE)
-    
-    def get_en_whitelist(self) -> bool:
-        return self.estado & Estado.EN_WHITELIST > 0
-
-    def set_en_whitelist(self, en: bool) -> bool:
-        if en:
-            self.estado = self.estado | Estado.EN_WHITELIST
-        else:
-            self.estado = self.estado & (~Estado.EN_WHITELIST)
 
     def get_solicitando_whitelist(self) -> bool:
         return self.estado & Estado.SOLICITANDO_WHITELIST > 0

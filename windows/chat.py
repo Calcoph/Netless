@@ -126,7 +126,7 @@ class GUIChat(GenericGUI):
         nombre = self.usuario.obtener_nombre()
         chat = self.usuario.obtener_chat()
         chat.mostrar_en_pantalla()
-        if True:#acepta_conexiones:
+        if acepta_conexiones:
             self.activar_envio()
         else:
             self.desactivar_envio()
@@ -185,7 +185,6 @@ class GUIChat(GenericGUI):
     def añadir_a_whitelist(self):
         Comunicacion.aceptar_conexion(self.usuario.ip)
         self.usuario.estado.set_solicitando_whitelist(False)
-        self.usuario.estado.set_en_whitelist(True)
         id = self.usuario.obtener_id()
         wl = Whitelist.get_whitelist()
         wl.añadir_usuario(id)
@@ -373,7 +372,8 @@ class MessageSenderApp(tk.Frame):
             elif tipo == TipoMensaje.SOLICITAR_CONEXION:
                 print("Se ha solicitado una conexión")
                 usuario = usuarios.usuario_ip(direccion)
-                if usuario.estado.get_en_whitelist():
+                wl = Whitelist.get_whitelist()
+                if wl.usuario_aceptado(usuario.id):
                     Comunicacion.aceptar_conexion(direccion)
                 else:
                     usuario.estado.set_solicitando_whitelist(True)

@@ -40,6 +40,8 @@ class Whitelist:
                 break
         if remove_index is not None:
             self.lista_ids.pop(remove_index)
+        else:
+            print("No se ha eliminado de la whitelist")
 
         db_helper = DbHelper.get()
 
@@ -48,4 +50,6 @@ class Whitelist:
         db_helper.delete(WhiteListContract.TABLE_NAME, where, where_values)
     
     def usuario_aceptado(self, id: str) -> bool:
+        print("Aceptado?")
+        print(id in self.lista_ids)
         return id in self.lista_ids
