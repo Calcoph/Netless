@@ -126,7 +126,7 @@ class GUIChat(GenericGUI):
         nombre = self.usuario.obtener_nombre()
         chat = self.usuario.obtener_chat()
         chat.mostrar_en_pantalla()
-        if acepta_conexiones:
+        if True:#acepta_conexiones:
             self.activar_envio()
         else:
             self.desactivar_envio()
