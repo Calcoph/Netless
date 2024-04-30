@@ -21,6 +21,7 @@ class TipoMensaje(Enum):
     SOLICITAR_PERMISO_ARCHIVO = 0x05
     RESPUESTA_PERMISO_ARCHIVO = 0x06
     SOLICITAR_CONEXION = 0x07
+    CONEXION_ACEPTADA = 0x08
 
 class SolicitarPermisoArchivo:
     def __init__(self) -> None:
@@ -189,14 +190,28 @@ class SolicitarConexion:
     def from_bytes(data: bytes) -> SolicitarConexion:
         if len(data) > 0:
             raise Exception("SolicitarConexion es un mensaje de tamaño 0")
-        return PedirIdentificacion()
+        return SolicitarConexion()
 
     def to_bytes(self) -> bytes:
         return bytes()
     
     def bytes_con_cabecera(self) -> bytes:
-        return Cabecera(None, TipoMensaje.SolicitarConexion, 0).to_bytes()
+        return Cabecera(None, TipoMensaje.SOLICITAR_CONEXION, 0).to_bytes()
 
+class ConexionAceptada:
+    def __init__(self) -> None:
+        pass
+
+    def from_bytes(data: bytes) -> ConexionAceptada:
+        if len(data) > 0:
+            raise Exception("ConexionAceptada es un mensaje de tamaño 0")
+        return ConexionAceptada()
+
+    def to_bytes(self) -> bytes:
+        return bytes()
+    
+    def bytes_con_cabecera(self) -> bytes:
+        return Cabecera(None, TipoMensaje.CONEXION_ACEPTADA, 0).to_bytes()
 
 class ComunicacionListener:
     def __init__(self, rx: Queue, tx: Queue) -> None:
@@ -215,6 +230,7 @@ class ComunicacionListener:
             TipoMensaje.CONTINUACION_FICHERO: self.handle_continuacion_fichero,
             TipoMensaje.FICHERO: self.handle_fichero,
             TipoMensaje.SOLICITAR_CONEXION: self.handle_solicitar_conexion,
+            TipoMensaje.CONEXION_ACEPTADA: self.handle_conexion_aceptada,
         }
         listener_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         listener_socket.bind(("0.0.0.0", 12345))
@@ -264,6 +280,10 @@ class ComunicacionListener:
     
     def handle_solicitar_conexion(self, cabecera: Cabecera, con: socket.socket, addr):
         self.tx.put(((TipoMensaje.SOLICITAR_CONEXION, addr), None))
+
+    def handle_conexion_aceptada(self, cabecera: Cabecera, con: socket.socket, addr):
+        print(f"Se ha aceptado conexion ident desde {addr}")
+        self.tx.put(((TipoMensaje.CONEXION_ACEPTADA, addr), None))
 
 class Comunicacion:
     COMM: Comunicacion = None
@@ -408,4 +428,16 @@ class Comunicacion:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((ip, 12345))
         sock.sendall(mensaje.bytes_con_cabecera())
+    
+    def solicitar_conexion(ip_destino: str):
+        mensaje = SolicitarConexion()
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((ip_destino, 12345))
+        sock.sendall(mensaje.bytes_con_cabecera())
 
+    def aceptar_conexion(ip: str):
+        mensaje = ConexionAceptada()
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((ip, 12345))
+        sock.sendall(mensaje.bytes_con_cabecera())

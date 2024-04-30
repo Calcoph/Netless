@@ -3,7 +3,7 @@ from __future__ import annotations
 from .database import DbHelper
 from .database.contracts import FicheroContract, EnviableContract, MensajeContract, UsuarioContract, ChatContract, EnviablesChatContract
 from .enviables import Enviable, Fichero, Mensaje, Dirección
-from ..comunicacion import Identificacion
+from ..comunicacion import Comunicacion, Identificacion
 import time
 
 class HistorialChat:
@@ -98,6 +98,25 @@ class ListaUsuarios:
         return ListaUsuarios.LISTA
     
     def añadir_usuario(self, usr: Usuario):
+        db_helper = DbHelper.DbHelper.get()
+
+        # Mira si el usuario no existe
+        columns = [
+            UsuarioContract.COLUMN_NAME_ID
+        ]
+        where = f"{UsuarioContract.COLUMN_NAME_ID} = ?"
+        where_values = (usr.id,)
+        usr_id = db_helper.select(UsuarioContract.TABLE_NAME, column_names=columns, where=where, where_values=where_values).fetch_one()
+        if usr_id is None:
+            columns = []
+            chat_id = db_helper.insert(ChatContract.TABLE_NAME, (), column_names=columns)
+            columns = [
+                UsuarioContract.COLUMN_NAME_ID,
+                UsuarioContract.COLUMN_NAME_CHAT_ID,
+                UsuarioContract.COLUMN_NAME_ALIAS,
+            ]
+            db_helper.insert(UsuarioContract.TABLE_NAME, (usr.id, chat_id, usr.nombre), column_names=columns)
+
         self.usuarios.append(usr)
     
     def quitar_usuario(self, id: str):
@@ -122,7 +141,7 @@ class ListaUsuarios:
 
         if usuario_registrado is None:
             usuario = Usuario(alias, ip, id)
-            self.usuarios.append(usuario)
+            self.añadir_usuario(usuario)
             usuario_registrado = usuario
 
         usuario_registrado.ultima_vez_visto = time.time()
@@ -234,4 +253,4 @@ class Usuario:
         return self.estado.get_acepta_conexiones()
     
     def solicitar_conexion(self):
-        print("ERROR: solicitar_conexion no está implementado")
+        Comunicacion.solicitar_conexion(self.ip)
