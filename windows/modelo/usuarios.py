@@ -81,7 +81,7 @@ class HistorialChat:
         for enviable in self.lista_enviables:
             enviable.mostrar_en_pantalla()
 
-    def inicializar(id: str):
+    def inicializar(self, id: str):
         db = DbHelper.get()
         columns = [
             EnviablesChatContract.COLUMN_NAME_ENV_ID,
@@ -93,8 +93,11 @@ class HistorialChat:
             where_values=[id]
         ).fetch_all()
 
+        self.lista_enviables = []
+
         for (env_id,) in db_enviables:
             enviable = Enviable.inicializar(env_id)
+            self.lista_enviables.append(enviable)
 
 TIEMPO_DESCONEXION = 300.0 # 5 minutos
 
@@ -124,7 +127,7 @@ class ListaUsuarios:
         return ListaUsuarios.LISTA
 
     def añadir_usuario(self, usr: Usuario):
-        db_helper = DbHelper.DbHelper.get()
+        db_helper = DbHelper.get()
 
         # Mira si el usuario no existe
         columns = [
