@@ -19,11 +19,20 @@ def scan_lan(ip_range) -> list[Direccion]:
     result = srp(packet, timeout=3, verbose=False)[0]
 
     # Lista para almacenar direcciones MAC e IPs
-    devices = []
+    devices: list[Direccion] = []
 
     for sent, received in result:
         # Agrega la dirección MAC e IP de cada dispositivo descubierto a la lista
-        devices.append(Direccion(received.psrc, received.hwsrc))
+        devices.append(Direccion(str(received.psrc), str(received.hwsrc)))
+
+    found_self = False
+    ip = str(get_if_addr(conf.iface))
+    for dev in devices:
+        if ip == dev.ip:
+            found_self = True
+
+    if not found_self:
+        devices.append(Direccion(ip, "No Mac"))
 
     return devices
 
@@ -39,4 +48,3 @@ def get_ip_range() -> str:
 #discover()
 
 # Imprime los dispositivos encontrados
-
