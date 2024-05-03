@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="azul_fondo">#00FFFF</color>
+    <color name="colorPrimary">#64b5f6</color>
+    <color name="colorPrimaryDark">#1565c0</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="primary">#ffc107</color>
+    <color name="primary_dark">#ffa000</color>
+    <color name="accent">#ff6e40</color>
+    <color name="azul_app">#afeeee</color>
+    <color name="azul_barra">#2a6478</color>
+</resources>
