@@ -1,0 +1,6 @@
+com.example.netless.test.app-annotation-experimental-1.3.0-0 C:\Users\jonam\.gradle\caches\transforms-3\555cc6d1bb146761eac0d5475c1d1eca\transformed\annotation-experimental-1.3.0\res
+com.example.netless.test.app-core-1.5.0-1 C:\Users\jonam\.gradle\caches\transforms-3\7e22801a7fef9743f65c7fdfe2083aee\transformed\core-1.5.0\res
+com.example.netless.test.app-androidTest-2 C:\Users\jonam\AndroidStudioProjects\NetLess\app\build\generated\res\resValues\androidTest\debug
+com.example.netless.test.app-mergeDebugAndroidTestResources-3 C:\Users\jonam\AndroidStudioProjects\NetLess\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
+com.example.netless.test.app-mergeDebugAndroidTestResources-4 C:\Users\jonam\AndroidStudioProjects\NetLess\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
+com.example.netless.test.app-debugAndroidTest-5 C:\Users\jonam\AndroidStudioProjects\NetLess\app\build\intermediates\merged_res\debugAndroidTest\mergeDebugAndroidTestResources

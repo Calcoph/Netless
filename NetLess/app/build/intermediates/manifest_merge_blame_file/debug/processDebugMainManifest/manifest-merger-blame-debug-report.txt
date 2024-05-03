@@ -1,0 +1,160 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.netless"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="16"
+9        android:targetSdkVersion="34" />
+10
+11    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+11-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:5:5-76
+11-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:5:22-73
+12    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+12-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:6:5-76
+12-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:6:22-73
+13    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+13-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:7:5-79
+13-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:7:22-76
+14    <uses-permission android:name="android.permission.INTERNET" />
+14-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:8:5-67
+14-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:8:22-64
+15    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+15-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:9:5-79
+15-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:9:22-76
+16    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+16-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:10:5-75
+16-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:10:22-72
+17    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+17-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:11:5-81
+17-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:11:22-78
+18    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+18-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:12:5-80
+18-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:12:22-77
+19
+20    <permission
+20-->[androidx.core:core:1.9.0] C:\Users\jonam\.gradle\caches\transforms-3\6513c5624bd5e66b3434a9661f43f592\transformed\core-1.9.0\AndroidManifest.xml:22:5-24:47
+21        android:name="com.example.netless.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+21-->[androidx.core:core:1.9.0] C:\Users\jonam\.gradle\caches\transforms-3\6513c5624bd5e66b3434a9661f43f592\transformed\core-1.9.0\AndroidManifest.xml:23:9-81
+22        android:protectionLevel="signature" />
+22-->[androidx.core:core:1.9.0] C:\Users\jonam\.gradle\caches\transforms-3\6513c5624bd5e66b3434a9661f43f592\transformed\core-1.9.0\AndroidManifest.xml:24:9-44
+23
+24    <uses-permission android:name="com.example.netless.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+24-->[androidx.core:core:1.9.0] C:\Users\jonam\.gradle\caches\transforms-3\6513c5624bd5e66b3434a9661f43f592\transformed\core-1.9.0\AndroidManifest.xml:26:5-97
+24-->[androidx.core:core:1.9.0] C:\Users\jonam\.gradle\caches\transforms-3\6513c5624bd5e66b3434a9661f43f592\transformed\core-1.9.0\AndroidManifest.xml:26:22-94
+25
+26    <application
+26-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:14:5-35:19
+27        android:allowBackup="true"
+27-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:15:9-35
+28        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+28-->[androidx.core:core:1.9.0] C:\Users\jonam\.gradle\caches\transforms-3\6513c5624bd5e66b3434a9661f43f592\transformed\core-1.9.0\AndroidManifest.xml:28:18-86
+29        android:dataExtractionRules="@xml/data_extraction_rules"
+29-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:16:9-65
+30        android:debuggable="true"
+31        android:extractNativeLibs="true"
+32        android:fullBackupContent="@xml/backup_rules"
+32-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:17:9-54
+33        android:icon="@mipmap/ic_launcher"
+33-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:18:9-43
+34        android:label="@string/app_name"
+34-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:19:9-41
+35        android:roundIcon="@mipmap/ic_launcher_round"
+35-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:20:9-54
+36        android:supportsRtl="true"
+36-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:21:9-35
+37        android:theme="@style/Theme.NetLess" >
+37-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:22:9-45
+38        <activity
+38-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:24:9-32:20
+39            android:name="com.example.netless.MainActivity"
+39-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:25:13-41
+40            android:exported="true" >
+40-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:26:13-36
+41            <intent-filter>
+41-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:27:13-31:29
+42                <action android:name="android.intent.action.MAIN" />
+42-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:28:17-69
+42-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:28:25-66
+43
+44                <category android:name="android.intent.category.LAUNCHER" />
+44-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:30:17-77
+44-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:30:27-74
+45            </intent-filter>
+46        </activity>
+47        <activity android:name="com.example.netless.HomeActivity" />
+47-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:33:9-49
+47-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:33:19-47
+48        <activity android:name="com.example.netless.WiFiServiceDiscoveryActivity" />
+48-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:34:9-65
+48-->C:\Users\jonam\AndroidStudioProjects\NetLess\app\src\main\AndroidManifest.xml:34:19-63
+49
+50        <provider
+50-->[androidx.emoji2:emoji2:1.2.0] C:\Users\jonam\.gradle\caches\transforms-3\b4bc221d103ad9d7262695070eed164b\transformed\emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
+51            android:name="androidx.startup.InitializationProvider"
+51-->[androidx.emoji2:emoji2:1.2.0] C:\Users\jonam\.gradle\caches\transforms-3\b4bc221d103ad9d7262695070eed164b\transformed\emoji2-1.2.0\AndroidManifest.xml:25:13-67
+52            android:authorities="com.example.netless.androidx-startup"
+52-->[androidx.emoji2:emoji2:1.2.0] C:\Users\jonam\.gradle\caches\transforms-3\b4bc221d103ad9d7262695070eed164b\transformed\emoji2-1.2.0\AndroidManifest.xml:26:13-68
+53            android:exported="false" >
+53-->[androidx.emoji2:emoji2:1.2.0] C:\Users\jonam\.gradle\caches\transforms-3\b4bc221d103ad9d7262695070eed164b\transformed\emoji2-1.2.0\AndroidManifest.xml:27:13-37
+54            <meta-data
+54-->[androidx.emoji2:emoji2:1.2.0] C:\Users\jonam\.gradle\caches\transforms-3\b4bc221d103ad9d7262695070eed164b\transformed\emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
+55                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+55-->[androidx.emoji2:emoji2:1.2.0] C:\Users\jonam\.gradle\caches\transforms-3\b4bc221d103ad9d7262695070eed164b\transformed\emoji2-1.2.0\AndroidManifest.xml:30:17-75
+56                android:value="androidx.startup" />
+56-->[androidx.emoji2:emoji2:1.2.0] C:\Users\jonam\.gradle\caches\transforms-3\b4bc221d103ad9d7262695070eed164b\transformed\emoji2-1.2.0\AndroidManifest.xml:31:17-49
+57            <meta-data
+57-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\jonam\.gradle\caches\transforms-3\3ec9a1abfae9b49bd60edc5fcf10f669\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:29:13-31:52
+58                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+58-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\jonam\.gradle\caches\transforms-3\3ec9a1abfae9b49bd60edc5fcf10f669\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:30:17-78
+59                android:value="androidx.startup" />
+59-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\jonam\.gradle\caches\transforms-3\3ec9a1abfae9b49bd60edc5fcf10f669\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:31:17-49
+60            <meta-data
+60-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
+61                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+61-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
+62                android:value="androidx.startup" />
+62-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
+63        </provider>
+64
+65        <receiver
+65-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
+66            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+66-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
+67            android:directBootAware="false"
+67-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
+68            android:enabled="true"
+68-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
+69            android:exported="true"
+69-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
+70            android:permission="android.permission.DUMP" >
+70-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
+71            <intent-filter>
+71-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
+72                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+72-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
+72-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
+73            </intent-filter>
+74            <intent-filter>
+74-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
+75                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+75-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
+75-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
+76            </intent-filter>
+77            <intent-filter>
+77-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
+78                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+78-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
+78-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
+79            </intent-filter>
+80            <intent-filter>
+80-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
+81                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+81-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
+81-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\jonam\.gradle\caches\transforms-3\74bf77d95cfdee6df3ae29bcda051207\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
+82            </intent-filter>
+83        </receiver>
+84    </application>
+85
+86</manifest>
