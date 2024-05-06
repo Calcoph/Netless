@@ -308,7 +308,7 @@ class Comunicacion:
             texto = Texto()
             texto.to_bytes()
             #se envía el contenido del paquete
-            s.sendall(cabecera_generica_enviar )#+ texto + message)
+            s.sendall(cabecera_generica_enviar + texto + message)
             s.close()
             #self.text_area.insert(tk.END, f"[You] {message}\n")
         except Exception as e:
