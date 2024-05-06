@@ -1,5 +1,6 @@
 from __future__ import annotations
 import sqlite3
+import threading
 from .contracts import ChatContract, EnviableContract, EnviablesChatContract, FicheroContract, MensajeContract, OpcionesContract, UsuarioContract, WhiteListContract, Contract
 from ..crypt import generar_id_aleatorio
 
@@ -32,18 +33,18 @@ class DbHelper:
         WhiteListContract
     ]
 
-    DB: DbHelper = None
+    DB: DbHelper = {}
 
-    def __init__(self) -> None:
+    def __init__(self, id) -> None:
         """NUNCA LLAMAR A LA CONSTRUCTORA DIRECTAMENTE, usar .get()"""
 
-        if self.DB is None:
-            self._init_db()
-            DbHelper.DB = self
+        if id not in self.DB:
+            self._init_db(id)
+            DbHelper.DB[id] = self
         else:
             raise SystemError
     
-    def _init_db(self) -> None:
+    def _init_db(self, id) -> None:
         """NUNCA LLAMAR A ESTA FUNCIÓN, usar .get()"""
         self.con = sqlite3.connect(self.DB_NAME)
         self.cur = self.con.cursor()
@@ -65,9 +66,10 @@ class DbHelper:
         self.con.commit()
     
     def get() -> DbHelper:
-        if DbHelper.DB is None:
-            DbHelper()
-        return DbHelper.DB
+        id = threading.get_ident()
+        if id not in DbHelper.DB:
+            DbHelper(id)
+        return DbHelper.DB[id]
 
     def insert(self, table_name: str, value: tuple[DBType], column_names: list[str]=[]) -> int:
         if len(column_names) == 0:
@@ -79,8 +81,17 @@ class DbHelper:
                 column_names_str += ","
             column_names_str = column_names_str[:-1] # Remove last ","
             column_names_str += ")"
-        sql_string = f"INSERT INTO {table_name}{column_names_str} VALUES ?"
+        if value == ():
+            sql_string = f"INSERT INTO {table_name}{column_names_str} DEFAULT VALUES"
+        else:
+            val_param_str = "("
+            for i in range(0, len(column_names)):
+                val_param_str += "?, "
+            val_param_str = val_param_str[:-2] + ")"
+            sql_string = f"INSERT INTO {table_name}{column_names_str} VALUES {val_param_str}"
 
+        print(sql_string)
+        print(value)
         self.cur.execute(sql_string, value)
         self.con.commit()
         return self.cur.lastrowid
@@ -117,9 +128,11 @@ class DbHelper:
             column_names_str = column_names_str[:-1] # Remove last \n
         sql_str = f"SELECT {column_names_str} FROM {table_name}"
         if where != "":
-            sql_str += f"WHERE {where}"
+            sql_str += f" WHERE {where}"
         if where_values is None:
             where_values = ()
+        print(sql_str)
+        print(where_values)
         return SelectResult(self.cur.execute(sql_str, where_values))
 
     def join_select(

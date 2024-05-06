@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">NetLess</string>
+
+    <string name="buscar_dispositivo">Buscando dispositivos...</string>
+    <string name="btn_enviar">Enviar</string>
+    <string name="escribir_texto">Escribe un mensaje</string>
+    <string name="conectando">Conectando...</string>
+    <string name="alias_salvado">Alias guardado correctamente</string>
+    <string name="alias_introducido">Porfavor introduce un alias </string>
+    <string name="seleccionar_archivo">selecciona archivo</string>
+
+</resources>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="accent">#ff6e40</color>
+    <color name="azul_app">#afeeee</color>
+    <color name="azul_barra">#2a6478</color>
+    <color name="azul_fondo">#00FFFF</color>
+    <color name="black">#FF000000</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="colorPrimary">#64b5f6</color>
+    <color name="colorPrimaryDark">#1565c0</color>
+    <color name="primary">#ffc107</color>
+    <color name="primary_dark">#ffa000</color>
+    <color name="white">#FFFFFFFF</color>
+    <string name="alias_introducido">Porfavor introduce un alias </string>
+    <string name="alias_salvado">Alias guardado correctamente</string>
+    <string name="app_name">NetLess</string>
+    <string name="btn_enviar">Enviar</string>
+    <string name="buscar_dispositivo">Buscando dispositivos...</string>
+    <string name="conectando">Conectando...</string>
+    <string name="escribir_texto">Escribe un mensaje</string>
+    <string name="seleccionar_archivo">selecciona archivo</string>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        
+        <item name="colorPrimary">@color/azul_barra</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+    <style name="AppTheme2" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/azul_barra</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+    <style name="Base.Theme.NetLess" parent="Theme.Material3.DayNight.NoActionBar">
+        
+        
+    </style>
+    <style name="Theme.NetLess" parent="Base.Theme.NetLess"/>
+    <style name="boldText">
+        <item name="android:textStyle">bold|italic</item>
+        <item name="android:textColor">#99CC00</item>
+    </style>
+    <style name="normalText">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">#33B5E5</item>
+    </style>
+</resources>

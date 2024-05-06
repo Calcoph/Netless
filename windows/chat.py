@@ -87,6 +87,7 @@ class GUIOpciones(GenericGUI):
 class GUIChat(GenericGUI):
     def __init__(self, parent: MessageSenderApp):
         super().__init__(parent, row=2)
+        self.parent = parent
         self.label = tk.Label(self, text="Hello world (GUIChat)")
         self.label.grid(row=0, column=0, padx=5, pady=5)
         self.label2 = tk.Label(self, text="ESTE MENSAJE NO DEBERÍA SER POSIBLE VERLO, ALGO HA SALIDO MAL (GUIChat)")
@@ -110,6 +111,12 @@ class GUIChat(GenericGUI):
         self.text_area = scrolledtext.ScrolledText(self, width=60, height=10)
         self.text_area.grid(row=4, columnspan=2, padx=5, pady=5)
 
+        # Botones de whitelist
+        self.whitelist_add_button = tk.Button(self, text="Añadir a whitelist", command=self.añadir_a_whitelist)
+        self.whitelist_add_button.grid(row=5, column=0, padx=5, pady=5)
+        self.whitelist_remove_button = tk.Button(self, text="Quitar de whitelist", command=self.eliminar_de_whitelist)
+        self.whitelist_remove_button.grid(row=5, column=1, padx=5, pady=5)
+
         self.receiver_thread = threading.Thread(target=self.receive_messages, daemon=True)
         self.receiver_thread.start()
     
@@ -119,7 +126,7 @@ class GUIChat(GenericGUI):
         nombre = self.usuario.obtener_nombre()
         chat = self.usuario.obtener_chat()
         chat.mostrar_en_pantalla()
-        if True:#acepta_conexiones:
+        if acepta_conexiones:
             self.activar_envio()
         else:
             self.desactivar_envio()
@@ -174,6 +181,14 @@ class GUIChat(GenericGUI):
         id = self.usuario.obtener_id()
         wl = Whitelist.get_whitelist()
         wl.quitar_usuario(id)
+    
+    def añadir_a_whitelist(self):
+        Comunicacion.aceptar_conexion(self.usuario.ip)
+        self.usuario.estado.set_solicitando_whitelist(False)
+        id = self.usuario.obtener_id()
+        wl = Whitelist.get_whitelist()
+        wl.añadir_usuario(id)
+        self.parent.gui_principal.actualizar_usuarios_disponibles()
 
     #al pulsar el botón enviar archivo se ejecuta esta función
     def send_file(self):
@@ -253,6 +268,10 @@ class GUIChat(GenericGUI):
                         break
                         """
         
+    def conexion_aceptada(self, id_usuario):
+        if id_usuario == self.usuario.id:
+            self.activar_envio()
+
 class GUIPrincipal(GenericGUI):
     def __init__(self, parent: MessageSenderApp):
         super().__init__(parent, row=1)
@@ -286,7 +305,7 @@ class GUIPrincipal(GenericGUI):
             usuario_button.grid(row=row, column=0, padx=5, pady=5)
 
             if usuario.estado.get_solicitando_whitelist():
-                solicitando_whitelist_text = tk.Label(self.usuarios, text="Solicitando conexión")
+                solicitando_whitelist_text = tk.Label(self.usuarios, text="Solicitando conexión (añádelo a whitelist)")
                 solicitando_whitelist_text.grid(row=row, column=1, padx=5, pady=5)
 
     def conexion_solicitada(self, id_usuario: str):
@@ -343,8 +362,7 @@ class MessageSenderApp(tk.Frame):
 
         while True:
             (tipo, direccion), mensaje = comunicaciones.rx.get()
-            print(type(direccion))
-            print(f"recibido {direccion}")
+            print(f"recibido de {direccion}")
 
             if tipo == TipoMensaje.IDENTIFICACION:
                 usuarios.identificar(mensaje, direccion)
@@ -354,9 +372,20 @@ class MessageSenderApp(tk.Frame):
             elif tipo == TipoMensaje.SOLICITAR_CONEXION:
                 print("Se ha solicitado una conexión")
                 usuario = usuarios.usuario_ip(direccion)
-                usuario.estado.set_solicitando_whitelist(True)
+                wl = Whitelist.get_whitelist()
+                if wl.usuario_aceptado(usuario.id):
+                    Comunicacion.aceptar_conexion(direccion)
+                else:
+                    usuario.estado.set_solicitando_whitelist(True)
+                    id_usuario = usuario.id
+                    self.gui_principal.conexion_solicitada(id_usuario)
+            elif tipo == TipoMensaje.CONEXION_ACEPTADA:
+                print("Se ha aceptado una conexión")
+                usuario = usuarios.usuario_ip(direccion)
+                usuario.estado.set_solicitando_whitelist(False)
+                usuario.estado.set_acepta_conexiones(True)
                 id_usuario = usuario.id
-                self.gui_principal.conexion_solicitada(id_usuario)
+                self.gui_chat.conexion_aceptada(id_usuario)
     
     def auto_scan(self):
         Comunicacion.get_com().discover()
