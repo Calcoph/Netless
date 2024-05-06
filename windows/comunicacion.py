@@ -81,17 +81,25 @@ class Texto:
         return cabecera + auto_bytes
 
 class Fichero:
-    def __init__(self, data: bytes | None, mensaje: bytes) -> None:
+    def __init__(self, data: bytes | None, mensaje: bytes, cabecera: CabeceraFichero) -> None:
         self.mensaje = mensaje
+        self.cabecera = cabecera
 
     def from_bytes(data: bytes) -> Fichero:
-        mensaje = data.decode("utf-8")
-        return Fichero(data, mensaje)
+        mensaje = data
+        return Fichero(data, mensaje, None)
 
     def to_bytes(self) -> bytes:
         #no hace falta codificar ya que los datos serán enviados como bytes
         #datos = self.mensaje.encode("utf-8")
         return self.mensaje
+
+    def bytes_con_cabecera(self) -> bytes:
+        auto_bytes = self.to_bytes()
+        cabecera_fichero_bytes = self.cabecera.to_bytes()
+        cabecera_bytes = Cabecera(None, TipoMensaje.FICHERO, len(auto_bytes)).to_bytes()
+
+        return cabecera_bytes + cabecera_fichero_bytes + auto_bytes
 
 class CabeceraFichero:
     TAMAÑO_MINIMO: int = 4
@@ -102,15 +110,16 @@ class CabeceraFichero:
     def read_from_socket(conn: socket.socket) -> CabeceraFichero:
         data = conn.recv(CabeceraFichero.TAMAÑO_MINIMO)
         cursor = 0
-        metadata_size = data[cursor:cursor+4]
+        metadata_size = int.from_bytes(data[cursor:cursor+4], "little")
         cursor += 4
 
-        metadata = conn.recv(metadata_size).decode("utf-8")
+        metadata_bytes = conn.recv(metadata_size)
+        metadata = metadata_bytes.decode("utf-8")
 
-        return CabeceraFichero(data, metadata_size, metadata)
+        return CabeceraFichero(data + metadata_bytes, metadata)
 
     def to_bytes(self) -> bytes:
-        metadata_size = len(self.metadata).to_bytes(4)
+        metadata_size = len(self.metadata).to_bytes(4, "little")
         metadata = self.metadata.encode("utf-8")
 
         return metadata_size + metadata
@@ -286,7 +295,11 @@ class ComunicacionListener:
         raise NotImplementedError
 
     def handle_fichero(self, cabecera: Cabecera, con: socket.socket, addr):
-        raise NotImplementedError
+        cabecera_fichero = CabeceraFichero.read_from_socket(con)
+        cuerpo = con.recv(cabecera.message_size)
+        fich = Fichero.from_bytes(cuerpo)
+        fich.cabecera = cabecera_fichero
+        self.tx.put(((TipoMensaje.FICHERO, addr), fich))
 
     def handle_solicitar_conexion(self, cabecera: Cabecera, con: socket.socket, addr):
         self.tx.put(((TipoMensaje.SOLICITAR_CONEXION, addr), None))
@@ -358,6 +371,22 @@ class Comunicacion:
                 #self.text_area.insert(tk.END, f"[You] Sent file: {file_path}\n")
             except Exception as e:
                 print(f"An error occurred while sending file: {str(e)}")
+
+    def enviar_fichero(usuario, fichero: Fichero):
+        destination_ip = usuario.ip
+
+        #se cofigura un socket para el envío
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((destination_ip, 12345))
+            mensaje = fichero.bytes_con_cabecera()
+            #se envía el contenido del paquete
+            print(f"len: {len(mensaje)}")
+            s.sendall(mensaje)
+            s.close()
+            #self.text_area.insert(tk.END, f"[You] {message}\n")
+        except Exception as e:
+            print(f"An error occurred while sending message: {str(e)}")
 
     def receive_messages(self,):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

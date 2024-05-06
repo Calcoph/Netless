@@ -6,11 +6,12 @@ from tkinter import scrolledtext, filedialog
 import socket
 import threading
 
-from .comunicacion import Comunicacion, Texto, TipoMensaje
+from .comunicacion import CabeceraFichero, Comunicacion, Texto, TipoMensaje
 from .modelo.enviables import Fichero, Dirección
 from .modelo.whitelist import Whitelist
 from .modelo.usuarios import Usuario, ListaUsuarios
 from .modelo.configuración import OpcionesUsuario
+from windows import comunicacion
 
 class Enum:
     pass
@@ -117,9 +118,6 @@ class GUIChat(GenericGUI):
         self.whitelist_remove_button = tk.Button(self, text="Quitar de whitelist", command=self.eliminar_de_whitelist)
         self.whitelist_remove_button.grid(row=5, column=1, padx=5, pady=5)
 
-        self.receiver_thread = threading.Thread(target=self.receive_messages, daemon=True)
-        self.receiver_thread.start()
-
     def abrir_chat(self, usuario: Usuario):
         self.usuario = usuario
         acepta_conexiones = self.usuario.acepta_conexiones()
@@ -184,18 +182,15 @@ class GUIChat(GenericGUI):
 
     #al pulsar el botón enviar archivo se ejecuta esta función
     def send_file(self):
-        destination_ip = self.usuario.ip
         #a diferencia de send_message el archivo se obtiene de una ventana emergente
         file_path = filedialog.askopenfilename()
         if file_path:
             try:
                 with open(file_path, 'rb') as file:
                     file_content = file.read()
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.connect((destination_ip, 12345))  # se lee el archivo y se envía por el socket
-                s.sendall(f"FILE\n{file_path.split('/')[-1]}".encode('utf-8'))
-                s.sendall(file_content)
-                s.close()
+                cabecera_fichero = CabeceraFichero(None, file_path)
+                fichero = comunicacion.Fichero(None, file_content, cabecera_fichero)
+                Comunicacion.enviar_fichero(self.usuario, fichero)
                 self.text_area.insert(tk.END, f"[You] Sent file: {file_path}\n")
             except Exception as e:
                 print(f"An error occurred while sending file: {str(e)}")
@@ -259,6 +254,12 @@ class GUIChat(GenericGUI):
                         self.text_area.insert(tk.END, f"[{addr[0]}] Received file: {file_name}\n")
                         break
                         """
+
+    def receive_file(self, file: comunicacion.Fichero):
+        file_name = file.cabecera.metadata.split("/")[-1]
+        with open(f"{file_name}", "wb") as f:
+            f.write(file.mensaje)
+        self.text_area.insert(tk.END, f"[{self.usuario.nombre}] {file.cabecera.metadata}\n")
 
     def conexion_aceptada(self, id_usuario):
         if id_usuario == self.usuario.id:
@@ -381,6 +382,8 @@ class MessageSenderApp(tk.Frame):
             elif tipo == TipoMensaje.TEXTO:
                 print(f"recibido mensaje {mensaje.mensaje}")
                 self.gui_chat.receive_messages(mensaje)
+            elif tipo == TipoMensaje.FICHERO:
+                self.gui_chat.receive_file(mensaje)
 
     def auto_scan(self):
         Comunicacion.get_com().discover()
