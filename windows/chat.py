@@ -6,7 +6,7 @@ from tkinter import scrolledtext, filedialog
 import socket
 import threading
 
-from .comunicacion import Comunicacion, TipoMensaje
+from .comunicacion import Comunicacion, Texto, TipoMensaje
 from .modelo.enviables import Fichero, Dirección
 from .modelo.whitelist import Whitelist
 from .modelo.usuarios import Usuario, ListaUsuarios
@@ -28,13 +28,13 @@ class GenericGUI(tk.Frame):
         self.column = column
         self.padx = padx
         self.pady = pady
-    
+
     def show(self):
         self.grid(row=self.row, column=self.column, padx=self.padx, pady=self.pady)
 
     def hide(self):
         self.grid_forget()
-    
+
     def destroy_children(self) -> GenericGUI:
         self.hide()
         new_instance = GenericGUI(self.parent, self.row, self.column, self.padx, self.pady)
@@ -69,13 +69,13 @@ class GUIOpciones(GenericGUI):
         opciones.cambiar_alias(nuevo_alias)
 
         self.mostrar_en_pantalla()
-    
+
     def cambiar_id(self):
         opciones = OpcionesUsuario.get_opciones()
         opciones.cambiar_id()
 
         self.mostrar_en_pantalla()
-    
+
     def mostrar_en_pantalla(self):
         opciones = OpcionesUsuario.get_opciones()
         alias = opciones.get_alias()
@@ -119,7 +119,7 @@ class GUIChat(GenericGUI):
 
         self.receiver_thread = threading.Thread(target=self.receive_messages, daemon=True)
         self.receiver_thread.start()
-    
+
     def abrir_chat(self, usuario: Usuario):
         self.usuario = usuario
         acepta_conexiones = self.usuario.acepta_conexiones()
@@ -140,7 +140,7 @@ class GUIChat(GenericGUI):
     def activar_envio(self):
         self.button_send_message["state"] = "normal"
         self.button_send_file["state"] = "normal"
-    
+
     def desactivar_envio(self):
         self.button_send_message["state"] = "disabled"
         self.button_send_file["state"] = "disabled"
@@ -148,19 +148,11 @@ class GUIChat(GenericGUI):
     #al pulsar el botón enviar mensaje se ejecuta esta función
     def send_message(self):
         #de los textos de entrada obtenemos la dirección y el mensaje
-        destination_ip = self.usuario.ip
         message = self.entry_message.get()
-        #se cofigura un socket para el envío
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((destination_ip, 12345))
-            s.sendall(f"TEXT\n{message}".encode('utf-8'))
-            s.close()
-            #se añade un mensaje en el área de texto
-            self.text_area.insert(tk.END, f"[You] {message}\n")
-        except Exception as e:
-            print(f"An error occurred while sending message: {str(e)}")
-        
+        Comunicacion.enviar_mensaje(self.usuario, message)
+        #se añade un mensaje en el área de texto
+        self.text_area.insert(tk.END, f"[You] {message}\n")
+
     def enviar_fichero(self):
         fichero = self.seleccionar_fichero()
         nombre = fichero.obtener_nombre()
@@ -169,7 +161,7 @@ class GUIChat(GenericGUI):
         self.usuario.obtener_confirmacion(nombre, tamaño)
         fichero = Fichero(nombre, tamaño, Dirección.Saliente)
         self.usuario.enviar_fichero(fichero)
-    
+
     def seleccionar_fichero(self):# -> File:
         raise NotImplementedError
 
@@ -181,7 +173,7 @@ class GUIChat(GenericGUI):
         id = self.usuario.obtener_id()
         wl = Whitelist.get_whitelist()
         wl.quitar_usuario(id)
-    
+
     def añadir_a_whitelist(self):
         Comunicacion.aceptar_conexion(self.usuario.ip)
         self.usuario.estado.set_solicitando_whitelist(False)
@@ -207,15 +199,16 @@ class GUIChat(GenericGUI):
                 self.text_area.insert(tk.END, f"[You] Sent file: {file_path}\n")
             except Exception as e:
                 print(f"An error occurred while sending file: {str(e)}")
-    
-    def receive_messages(self,):
+
+    def receive_messages(self, mensaje: Texto):
+        self.text_area.insert(tk.END, f"[{self.usuario.nombre}] {mensaje.mensaje}\n")
         """s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind(('0.0.0.0', 12345)) 
+        s.bind(('0.0.0.0', 12345))
         s.listen(1)
 
         while True:
             conn, addr = s.accept()
-            
+
             with conn:
 
                 #se selecciona el tipo a recibir
@@ -224,7 +217,6 @@ class GUIChat(GenericGUI):
 
                 if message_type == 'TEXT':
                         message = '\n'.join(rest)
-                        self.text_area.insert(tk.END, f"[{addr[0]}] {message}\n")
 
                 elif message_type == 'FILE':
                         file_name = rest[0]
@@ -253,7 +245,7 @@ class GUIChat(GenericGUI):
                     message_type, *rest = data.decode('utf-8').split('\n')
                     if message_type == 'TEXT':
                         message = '\n'.join(rest)
-                        
+
                         self.text_area.insert(tk.END, f"[{addr[0]}] {message}\n")
                     elif message_type == 'FILE':
                         file_name = rest[0]
@@ -267,7 +259,7 @@ class GUIChat(GenericGUI):
                         self.text_area.insert(tk.END, f"[{addr[0]}] Received file: {file_name}\n")
                         break
                         """
-        
+
     def conexion_aceptada(self, id_usuario):
         if id_usuario == self.usuario.id:
             self.activar_envio()
@@ -294,13 +286,13 @@ class GUIPrincipal(GenericGUI):
 
     def aceptar_usuario(self, id_usuario: str):
         Whitelist.añadir_usuario(id_usuario)
-    
+
     def actualizar_usuarios_disponibles(self):
         self.usuarios = self.usuarios.destroy_children()
 
         usuarios = ListaUsuarios.get_lista()
         for (row, usuario) in enumerate(usuarios.usuarios_disponibles()):
-            usuario_button = tk.Button(self.usuarios, text=usuario.ip, command=lambda x=usuario.id: self.parent.abrir_chat(x))
+            usuario_button = tk.Button(self.usuarios, text=usuario.nombre, command=lambda x=usuario.id: self.parent.abrir_chat(x))
             usuario_button.id_usuario = usuario.id
             usuario_button.grid(row=row, column=0, padx=5, pady=5)
 
@@ -341,14 +333,14 @@ class MessageSenderApp(tk.Frame):
         self.vista_seleccionada = Vistas.MENSAJES
 
         self.back_button.grid(row=1, column=0, padx=5, pady=5)
-    
+
     def volver_a_gui_principal(self):
         self.vista_seleccionada = Vistas.USUARIOS
         self.back_button.grid_forget()
         self.gui_chat.hide()
         self.gui_opciones.hide()
         self.gui_principal.show()
-    
+
     def abrir_opciones(self):
         self.gui_principal.hide()
         self.vista_seleccionada = Vistas.OPCIONES
@@ -386,7 +378,10 @@ class MessageSenderApp(tk.Frame):
                 usuario.estado.set_acepta_conexiones(True)
                 id_usuario = usuario.id
                 self.gui_chat.conexion_aceptada(id_usuario)
-    
+            elif tipo == TipoMensaje.TEXTO:
+                print(f"recibido mensaje {mensaje.mensaje}")
+                self.gui_chat.receive_messages(mensaje)
+
     def auto_scan(self):
         Comunicacion.get_com().discover()
         while True:

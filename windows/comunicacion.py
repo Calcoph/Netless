@@ -37,7 +37,7 @@ class SolicitarPermisoArchivo:
     def to_bytes(self) -> bytes:
         raise NotImplementedError
         return bytes()
-    
+
     def bytes_con_cabecera(self) -> bytes:
         raise NotImplementedError
         return Cabecera(None, TipoMensaje.PEDIR_IDENTIFICACION, 0).to_bytes()
@@ -56,27 +56,29 @@ class RespuestaPermisoArchivo:
     def to_bytes(self) -> bytes:
         raise NotImplementedError
         return bytes()
-    
+
     def bytes_con_cabecera(self) -> bytes:
         raise NotImplementedError
         return Cabecera(None, TipoMensaje.PEDIR_IDENTIFICACION, 0).to_bytes()
 
 class Texto:
     def __init__(self, data: bytes | None, mensaje: str) -> None:
-        self.mensaje = str
+        self.mensaje = mensaje
 
     def from_bytes(data: bytes) -> Texto:
-        cursor = 0
-        tamaño_mensaje = data[cursor:cursor+2] # 2 bytes: tamaño del mensaje
-        cursor += 2
-        mensaje = data[cursor:cursor+tamaño_mensaje].decode("utf-8")
-        cursor += tamaño_mensaje
+        mensaje = data.decode("utf-8")
 
         return Texto(data, mensaje)
-    
-    def to_bytes(self, data: bytes| None, mensaje: str) -> bytes:
-        self.mensaje.encode("utf-8")
+
+    def to_bytes(self) -> bytes:
+        mensaje = self.mensaje.encode("utf-8")
         return mensaje
+
+    def bytes_con_cabecera(self) -> bytes:
+        auto_bytes = self.to_bytes()
+        cabecera = Cabecera(None, TipoMensaje.TEXTO, len(auto_bytes)).to_bytes()
+
+        return cabecera + auto_bytes
 
 class Fichero:
     def __init__(self, data: bytes | None, mensaje: bytes) -> None:
@@ -85,18 +87,18 @@ class Fichero:
     def from_bytes(data: bytes) -> Fichero:
         mensaje = data.decode("utf-8")
         return Fichero(data, mensaje)
-    
+
     def to_bytes(self) -> bytes:
         #no hace falta codificar ya que los datos serán enviados como bytes
         #datos = self.mensaje.encode("utf-8")
         return self.mensaje
-    
+
 class CabeceraFichero:
     TAMAÑO_MINIMO: int = 4
     def __init__(self, data: bytes | None, metadata: str) -> None:
         self.data = data
         self.metadata = metadata
-    
+
     def read_from_socket(conn: socket.socket) -> CabeceraFichero:
         data = conn.recv(CabeceraFichero.TAMAÑO_MINIMO)
         cursor = 0
@@ -106,7 +108,7 @@ class CabeceraFichero:
         metadata = conn.recv(metadata_size).decode("utf-8")
 
         return CabeceraFichero(data, metadata_size, metadata)
-    
+
     def to_bytes(self) -> bytes:
         metadata_size = len(self.metadata).to_bytes(4)
         metadata = self.metadata.encode("utf-8")
@@ -122,6 +124,7 @@ class Cabecera:
 
     def read_from_socket(conn: socket.socket) -> Cabecera:
         data = conn.recv(Cabecera.TAMAÑO)
+        print(len(data))
         cursor = 0
         type = data[cursor] # 1 byte: tipo
         cursor += 1
@@ -153,7 +156,7 @@ class Identificacion:
         cursor += tamaño_id
 
         return Identificacion(data, alias, id)
-    
+
     def to_bytes(self) -> bytes:
         tamaño_alias = len(self.alias).to_bytes(2, "little")
         tamaño_id = len(self.id).to_bytes(2, "little")
@@ -179,10 +182,10 @@ class PedirIdentificacion:
 
     def to_bytes(self) -> bytes:
         return bytes()
-    
+
     def bytes_con_cabecera(self) -> bytes:
         return Cabecera(None, TipoMensaje.PEDIR_IDENTIFICACION, 0).to_bytes()
-    
+
 class SolicitarConexion:
     def __init__(self) -> None:
         pass
@@ -194,7 +197,7 @@ class SolicitarConexion:
 
     def to_bytes(self) -> bytes:
         return bytes()
-    
+
     def bytes_con_cabecera(self) -> bytes:
         return Cabecera(None, TipoMensaje.SOLICITAR_CONEXION, 0).to_bytes()
 
@@ -209,7 +212,7 @@ class ConexionAceptada:
 
     def to_bytes(self) -> bytes:
         return bytes()
-    
+
     def bytes_con_cabecera(self) -> bytes:
         return Cabecera(None, TipoMensaje.CONEXION_ACEPTADA, 0).to_bytes()
 
@@ -219,7 +222,7 @@ class ComunicacionListener:
         self.tx = tx
         th = threading.Thread(target=self.listen, daemon=True)
         th.start()
-    
+
     def listen(self):
         handlers = {
             TipoMensaje.PEDIR_IDENTIFICACION: self.handle_pedir_identificacion,
@@ -251,7 +254,7 @@ class ComunicacionListener:
             except TimeoutError:
                 # Es para que de vez en cuando mire self.rx
                 pass
-    
+
     def handle_identificacion(self, cabecera: Cabecera, con: socket.socket, addr):
         if cabecera.message_size == 0:
             # Un mensaje de tipo identificación tiene que tener cuerpo
@@ -264,27 +267,27 @@ class ComunicacionListener:
     def handle_texto(self, cabecera: Cabecera, con: socket.socket, addr):
         ###################################################
         cuerpo = con.recv(cabecera.message_size)
-        texto = Texto.from_abytes(cuerpo)
+        texto = Texto.from_bytes(cuerpo)
         print(f"Se ha enviado ident a {addr}")
         self.tx.put(((TipoMensaje.TEXTO, addr), texto))
         ###################################################raise NotImplementedError
-    
+
     def handle_pedir_identificacion(self, cabecera: Cabecera, con: socket.socket, addr):
         print(f"Se ha pedido ident desde {addr}")
         self.tx.put(((TipoMensaje.PEDIR_IDENTIFICACION, addr), None))
-    
+
     def handle_solicitar_permiso_archivo(self, cabecera: Cabecera, con: socket.socket, addr):
         raise NotImplementedError
-    
+
     def handle_respuesta_permiso_archivo(self, cabecera: Cabecera, con: socket.socket, addr):
         raise NotImplementedError
-    
+
     def handle_continuacion_fichero(self, cabecera: Cabecera, con: socket.socket, addr):
         raise NotImplementedError
-    
+
     def handle_fichero(self, cabecera: Cabecera, con: socket.socket, addr):
         raise NotImplementedError
-    
+
     def handle_solicitar_conexion(self, cabecera: Cabecera, con: socket.socket, addr):
         self.tx.put(((TipoMensaje.SOLICITAR_CONEXION, addr), None))
 
@@ -310,25 +313,18 @@ class Comunicacion:
 
         return Comunicacion.COMM
 
-    def enviar_mensaje(self, usuario, chat, mensaje: str):
+    def enviar_mensaje(usuario, mensaje: str):
         destination_ip = usuario.ip
-        message = chat.entry_message.get()
-        
+
         #se cofigura un socket para el envío
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((destination_ip, 12345))
-            #Se crea la cabecera genérica
-            cabecera_generica = Cabecera()
-            cabecera_generica.type = TipoMensaje.TEXTO
-            cabecera_generica_enviar = cabecera_generica.to_bytes()
-            print("parte del envio:\n")
-            print(cabecera_generica.type)
-            #Se crea la cabecera de texto
-            texto = Texto()
-            texto.to_bytes()
+            texto = Texto(None, mensaje)
+            mensaje = texto.bytes_con_cabecera()
             #se envía el contenido del paquete
-            s.sendall(cabecera_generica_enviar + texto + message)
+            print(f"len: {len(mensaje)}")
+            s.sendall(mensaje)
             s.close()
             #self.text_area.insert(tk.END, f"[You] {message}\n")
         except Exception as e:
@@ -344,7 +340,7 @@ class Comunicacion:
                     file_content = file.read()
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.connect((destination_ip, 12345))  # se lee el archivo y se envía por el socket
-                
+
 
                 #se envía la cabecera genérica
                 cabecera_generica = Cabecera()
@@ -362,10 +358,10 @@ class Comunicacion:
                 #self.text_area.insert(tk.END, f"[You] Sent file: {file_path}\n")
             except Exception as e:
                 print(f"An error occurred while sending file: {str(e)}")
-    
+
     def receive_messages(self,):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind(('0.0.0.0', 12345)) 
+        s.bind(('0.0.0.0', 12345))
         s.listen(1)
 
         while True:
@@ -373,7 +369,7 @@ class Comunicacion:
             with conn:
 
                 #se recibe la cabecera genérica
-                
+
                 data = conn.recv(1024)
                 message_type, *rest = data.decode('utf-8').split('\n')
                 """""
@@ -431,7 +427,7 @@ class Comunicacion:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((ip, 12345))
         sock.sendall(mensaje.bytes_con_cabecera())
-    
+
     def solicitar_conexion(ip_destino: str):
         mensaje = SolicitarConexion()
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
